@@ -1,0 +1,216 @@
+         /* 
+html5doctor.com Reset Stylesheet
+v1.6.1
+Last Updated: 2010-09-17
+Author: Richard Clark - http://richclarkdesign.com 
+Twitter: @rich_clark
+*/
+
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+    margin:0;
+    padding:0;
+    border:0;
+    outline:0;
+    font-size:100%;
+    vertical-align:baseline;
+    background:transparent;
+}
+
+body {
+    line-height:1;
+}
+
+article,aside,details,figcaption,figure,
+footer,header,hgroup,menu,nav,section { 
+	display:block;
+}
+
+nav ul {
+    list-style:none;
+}
+
+blockquote, q {
+    quotes:none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content:'';
+    content:none;
+}
+
+a {
+    margin:0;
+    padding:0;
+    font-size:100%;
+    vertical-align:baseline;
+    background:transparent;
+}
+
+/* change colours to suit your needs */
+ins {
+    background-color:#ff9;
+    color:#000;
+    text-decoration:none;
+}
+
+/* change colours to suit your needs */
+mark {
+    background-color:#ff9;
+    color:#000; 
+    font-style:italic;
+    font-weight:bold;
+}
+
+del {
+    text-decoration: line-through;
+}
+
+abbr[title], dfn[title] {
+    border-bottom:1px dotted;
+    cursor:help;
+}
+
+table {
+    border-collapse:collapse;
+    border-spacing:0;
+}
+
+/* change border colour to suit your needs */
+hr {
+    display:block;
+    height:1px;
+    border:0;   
+    border-top:1px solid #cccccc;
+    margin:1em 0;
+    padding:0;
+}
+
+input, select {
+    vertical-align:middle;
+}
+
+/*end reset*/
+/*the thing starts here*/
+.left { float: left; }
+
+html {
+    font-family: arial;
+    font-size: 10px;
+}
+body {
+    display: block;
+    overflow: hidden;
+    width: 32rem;
+    border-right: 1px solid blue;
+}
+    .grid {
+        background: url(images/grid_8x.png) repeat;
+        display: block;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+    }
+        .grid p {
+            font-size: 1.6rem;
+            line-height: 1.6rem;
+            padding: 1.6rem 0 0.8rem 2.4rem;
+            color: rgba(0,0,0,0.8);
+        }
+        .grid ul {
+            display: block;
+            overflow: hidden;
+            margin-left: 2.4rem;
+        }
+            .grid ul li {
+                display: block;
+                overflow: hidden;
+                background: rgba(0,0,255,0.4);
+                float: left;
+                margin-left: 1.6rem;
+            }
+            ul.grid-8 li {
+                width: 0.8rem;
+                height: 0.8rem;
+            }
+            ul.grid-16 li {
+                width: 1.6rem;
+                height: 1.6rem;
+            }
+            ul.grid-24 li {
+                width: 2.4rem;
+                height: 2.4rem;
+            }
+            ul.grid-32 li {
+                width: 3.2rem;
+                height: 3.2rem;
+            }
+            ul.grid-48 li {
+                width: 4.8rem;
+                height: 4.8rem;
+            }
+            ul.grid-56 li {
+                width: 5.6rem;
+                height: 5.6rem;
+            }
+            ul.grid-64 li {
+                width: 6.4rem;
+                height: 6.4rem;
+            }
+            ul.grid-136 li {
+                width: 13.6rem;
+                height: 13.6rem;
+            }
+            ul li:first-child {
+                margin-left: 0;
+            }
+
+
+@media screen and (-webkit-device-pixel-ratio: 1.5), screen and (-moz-device-pixel-ratio: 1.5) {
+    html {
+        font-size: 93.75%;
+    }
+    .grid {
+        background: url(images/grid_8x1.5.png) repeat;
+        /*background-size: 5%;*/
+    }
+
+}
+@media screen and (-webkit-device-pixel-ratio: 2), screen and (-moz-device-pixel-ratio: 2) {
+    html {
+        -webkit-text-size-adjust: 50%;
+        font-size: 20px;
+    }
+    /*.grid {
+        background: url(images/grid_8x2.png) repeat;
+        background-size: 5%;
+    }*/
+    
+    /*.grid p {
+        font-size: 6rem;
+    }*/
+
+}
+
+
+/* @media only screen and (min-width : 150mozmm) {
+    body {              
+        background: green;
+    }
+    body:after {
+        content: "min-width : 150mozmm";
+    }
+}*/
+
+

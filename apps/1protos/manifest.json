@@ -1,0 +1,39 @@
+{
+  "name": "Protos",
+  "description": "Protos",
+  "launch_path": "/",
+  "developer": {
+    "name": "The Gaia Team",
+    "url": "https://github.com/andreasgal/gaia"
+  },
+  "locales": {
+    "ar": {
+      "name": "Protos",
+      "description": "Protos"
+    },
+    "de": {
+      "name": "Protos",
+      "description": "Protos"
+    },
+    "en-US": {
+      "name": "Protos",
+      "description": "Protos"
+    },
+    "fr": {
+      "name": "Protos",
+      "description": "Protos"
+    },
+    "ru": {
+      "name": "Protos",
+      "description": "Protos"
+    },
+    "zh-TW": {
+      "name": "Protos",
+      "description": "Protos"
+    }
+  },
+  "default_locale": "en-US",
+  "icons": {
+    "120": "/style/icons/Calculator.png"
+  }
+}
