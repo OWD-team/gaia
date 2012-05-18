@@ -112,8 +112,8 @@ html {
 body {
     display: block;
     overflow: hidden;
-    width: 32rem;
-    border-right: 1px solid blue;
+    /*width: 32rem;
+    border-right: 1px solid blue;*/
 }
     .grid {
         background: url(images/grid_8x.png) repeat;
@@ -177,31 +177,26 @@ body {
             }
 
 
-@media screen and (-webkit-device-pixel-ratio: 1.5), screen and (-moz-device-pixel-ratio: 1.5) {
+@media screen and (-webkit-device-pixel-ratio: 1.5), screen and (max--moz-device-pixel-ratio: 1.5) {
     html {
-        font-size: 93.75%;
+        font-size: 15px;
     }
     .grid {
         background: url(images/grid_8x1.5.png) repeat;
-        /*background-size: 5%;*/
     }
 
 }
-@media screen and (-webkit-device-pixel-ratio: 2), screen and (-moz-device-pixel-ratio: 2) {
+/*@media screen and (-webkit-device-pixel-ratio: 2), screen and (max--moz-device-pixel-ratio: 2) {
     html {
         -webkit-text-size-adjust: 50%;
         font-size: 20px;
     }
-    /*.grid {
+    .grid {
         background: url(images/grid_8x2.png) repeat;
-        background-size: 5%;
-    }*/
-    
-    /*.grid p {
-        font-size: 6rem;
-    }*/
+        //background-size: 5%;
+    }
 
-}
+}*/
 
 
 /* @media only screen and (min-width : 150mozmm) {
