@@ -1,0 +1,21 @@
+{
+  "name": "comms",
+  "description": "Telefonica Comms",
+  "launch_path": "/",
+  "developer": {
+    "name": "Telefonica TID",
+    "url": "http://tid.es"
+  },
+  "locales": {
+    "en-US": {
+      "name": "Comms",
+      "description": "Telefonica Comms"
+    },
+    "es": {
+      "name": "Comms",
+      "description": "Telfonica Comms"
+    }
+  },
+  "default_locale": "en-US",
+  "orientation": "portrait-primary"
+}

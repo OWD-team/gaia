@@ -1,0 +1,24 @@
+{
+  "name": "Shortcuts",
+  "description": "Gaia Shortcuts",
+  "launch_path": "/",
+  "developer": {
+    "name": "The Gaia Team",
+    "url": "https://github.com/andreasgal/gaia"
+  },
+	"permissions": [
+	    "mozApps"
+	],
+  "locales": {
+    "en-US": {
+      "name": "Shortcuts",
+      "description": "Gaia shortcuts"
+    },
+    "es": {
+      "name": "Atajos",
+      "description": "Atajos de Gaia"
+    }
+  },
+  "default_locale": "en-US",
+  "orientation": "portrait-primary"
+}

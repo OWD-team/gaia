@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html manifest="manifest.appcache">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <title>Clock</title>
+    <link rel="stylesheet" type="text/css" href="style/shortcuts.css">
+    <script>
+      var host = document.location.host;
+      var domain = host.replace(/(^[\w\d]+\.)?([\w\d]+\.[a-z]+)/, '$2');
+      var src = 'http://' + domain + '/webapi.js';
+      document.write('<script src="' + src + '"><\/script>');
+    </script>
+		<script type="text/javascript" src="js/shortcuts.js" defer></script>
+  </head>
+
+	<!-- Standard shortcuts -->
+	
+  <body>
+		<div id="shortcuts">
+      <div class="shortcut" id="Dialer">
+        <img src="style/icons/Phone.png"></img>
+        <span>Dialer</span>
+      </div>
+      <div class="shortcut" id="Dialer">
+        <img src="style/icons/Messages.png"></img>
+        <span>Messages</span>
+      </div>
+      <div class="shortcut" id="Market">
+        <img src="style/icons/Market.png"></img>
+        <span>Market</span>
+      </div>
+      <div class="shortcut" id="Browser">
+        <img src="style/icons/Browser.png"></img>
+        <span>Browser</span>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html manifest="manifest.appcache">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="pragma" content="no-cache">
+    <title>Clock</title>
+    <link rel="stylesheet" type="text/css" href="style/comms.css">
+    <script>
+      var host = document.location.host;
+      var domain = host.replace(/(^[\w\d]+\.)?([\w\d]+\.[a-z]+)/, '$2');
+      var src = 'http://' + domain + '/webapi.js';
+      document.write('<script src="' + src + '"><\/script>');
+    </script>
+  </head>
+
+	<!-- Standard shortcuts -->
+	
+  <body>
+    <p> Hello World! </p>
+    <iframe id="shortcuts" src="http://shortcuts.gaiamobile.org" frameborder="0"></iframe>
+  </body>
+</html>

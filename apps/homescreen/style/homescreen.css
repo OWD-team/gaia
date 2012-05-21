@@ -155,18 +155,3 @@ body > .icon {
   background: rgba(0,0,0,0.1);
 }
 
-#shortcuts .shortcut {
-  float: left;
-  width: 25%;
-  margin: 5px 0;
-  text-align: center;
-}
-
-#shortcuts .shortcut img {
-  display: block;
-  height: 79px;
-  height: 79px;
-  border-radius: 10px;
-  margin: 10px auto 15px auto;
-}
-
