@@ -11,7 +11,7 @@ $().ready(function(){
     
     //display date and time
     var myDate = new Date();
-    var dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturnday', 'Sunday']
+    var dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ]
     var MonthName = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'september', 'October', 'November', 'December'];
     var today = dayName[myDate.getDay()] + ' ' + myDate.getDate() + ' ' + MonthName[myDate.getMonth()];
     var now = pad2(myDate.getHours()) + ':' + pad2(myDate.getMinutes());
@@ -96,8 +96,29 @@ $().ready(function(){
                 'width': deviceW
             });
                
-              // $('#favApps').scrollview({ pagingEnabled: true }); 
-               $('#favApps').scrollview('scrollTo',-225,0); 
+                // $('#favApps').scrollview({ pagingEnabled: true });
+                // Initial position
+                favInit = $('#favApps .ui-scrollview-view').width() / 2;
+                $('#favApps').scrollview('scrollTo',-favInit,0);
+
+                var baseFontSizePx = $('html').css('font-size');
+                var baseFontSize = parseInt(baseFontSizePx.substr(0,2));
+                console.log(baseFontSize);
+
+                $('#favApps').bind('vmouseup', function(e) {
+                    setTimeout(function(){
+                        var scrollX = $('#favApps').scrollview('getScrollPosition').x;
+                        var iconSize = 6.5 * baseFontSize
+                        var initGap = scrollX + (10 * baseFontSize); //position * marginLeft - halfIconSize * baseFontSize
+                        var selectedIcon = Math.floor(initGap / iconSize) - 1; 
+                        var moveTo = selectedIcon * iconSize;
+                        $('#favApps').scrollview('scrollTo',moveTo,0,200);
+                        //scale selected
+                        $('#favApps li').removeClass('selected');
+                        $('#favApps li:eq(' + selectedIcon +')').addClass('selected');
+                    },800);
+                    
+                }); 
                         
         $('#notifications').css({
            'height': deviceHSB,
@@ -165,7 +186,7 @@ $().ready(function(){
             $('footer ul').css({'opacity': 1});
         } 
     });*/
-    
+
     
 });
 
