@@ -7,7 +7,7 @@
 
 li { list-style: none; }
 
-body, html {
+html {
     font-size: 10px;
 }
 /* poneMask only for desktop browsers */
@@ -257,7 +257,7 @@ body, html {
             height: 5rem;
             width: 100%;
             position: absolute;
-            background: url('../images/bottom_nav_1px.png') center 0 no-repeat;//repeat-x;
+            background: url('../images/bottom_nav_1px.png') center 0 repeat-x;
             bottom: 0;
         }
             #OWD > footer a {
@@ -287,13 +287,13 @@ body, html {
                 border-top: 1px solid rgba(255,255,255,0.3);
             }
                 ul#favApps {
-                    margin-left: 13.5rem;
-                    width: 8rem;
+                    margin-left: 13rem;
+                    /*width: 8rem;*/
                     height: 10rem;
                     overflow: visible !important;
                 }
                     ul#favApps .ui-scrollview-view {
-                        width: 59rem !important; 
+                        width: 59.5rem !important; 
                         height: 10rem;
                     }
                         ul#favApps li {
@@ -304,16 +304,49 @@ body, html {
                             height: 5.5rem;
                             line-height: 5.5rem;
                             width: 5.5rem;
-                            margin: 1rem 1rem 0.5rem 0;
+                            margin: 1rem 0.5rem 1rem 0.5rem;
                             text-align: center;
                             font-size: 2rem;
                         }
                         ul#favApps li.selected {
-                            -webkit-transition: all 0.3s ease-out;
-                            -moz-transition: all 0.3s ease-out;
+                            -webkit-transition: all 0.3s ease-in;
+                            -moz-transition: all 0.3s ease-in;
                             -webkit-transform: scale(1.2); 
                             -moz-transform: scale(1.2);
                         } 
+
+                #favAppsPreview {
+                    background: #fff url('../images/preview.png') center 5px no-repeat;
+                    position: absolute;
+                    width: 30.5rem;
+                    height: 3.5rem;
+                    bottom: 8rem;
+                    border: 5px;
+                    border-radius: 0.5rem;
+                    padding: 0.5rem;
+                    left: 50%;
+                    margin-left: -15.2rem;
+                    opacity: 0;
+                }
+                    #favAppsPreview header {
+                        height: 2.5rem;
+                        width: 100%;
+                    }
+                #favAppsPreview.hide {
+                    -webkit-transition: all 0.5s ease-out;
+                    opacity: 0;
+                    bottom: 8rem;
+                }
+                #favAppsPreview.show {
+                    -webkit-transition: all 0.5s 2s ease-out;
+                    opacity: 1;
+                    bottom: 10rem;
+                }
+                #favAppsPreview.expand {
+                    -webkit-transition: all 0.5s ease-out;
+                    height: 248px;
+                }
+                
         
     .zoomOut {
         -webkit-transition: all 0.3s ease-out;
@@ -391,8 +424,8 @@ body, html {
 
 
 /* media query for 1.5 resolution */
-@media (min-resolution: 200dpi) {
-    html, body {
+@media screen and (-webkit-device-pixel-ratio: 1.5), screen and (max--moz-device-pixel-ratio: 1.5) {
+    html {
         font-size: 15px;
     }
     #statusBar .coverage {

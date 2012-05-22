@@ -105,7 +105,7 @@ $().ready(function(){
                 var baseFontSize = parseInt(baseFontSizePx.substr(0,2));
                 console.log(baseFontSize);
 
-                $('#favApps').bind('vmouseup', function(e) {
+                $('#favApps').bind('vmouseup', function() {
                     setTimeout(function(){
                         var scrollX = $('#favApps').scrollview('getScrollPosition').x;
                         var iconSize = 6.5 * baseFontSize
@@ -116,10 +116,26 @@ $().ready(function(){
                         //scale selected
                         $('#favApps li').removeClass('selected');
                         $('#favApps li:eq(' + selectedIcon +')').addClass('selected');
-                    },800);
-                    
-                }); 
-                        
+                        $('#favAppsPreview').addClass('show').removeClass('hide');
+                    },500);
+                        $('#favAppsPreview').addClass('hide').removeClass('show').removeClass('expand');
+                });
+
+                $('#favAppsPreview header').bind('vclick', function() {
+                    console.log('click')
+                    $('#favAppsPreview').hasClass('expand') == true ? 
+                        $('#favAppsPreview').addClass('hide').removeClass('show').removeClass('expand') :
+                        $('#favAppsPreview').addClass('expand')
+                });
+
+
+        // Carousel: Edit mode    
+        $('#favApps').bind('taphold', function() {
+            alert('taphold')
+        });        
+                 
+        
+        // Notifications    
         $('#notifications').css({
            'height': deviceHSB,
            'top': -deviceHSB
