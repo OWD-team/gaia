@@ -1,0 +1,21 @@
+/* Animations */
+.moveLeft { 
+    -webkit-transition: all 0.7s;
+    left: -100% !important;
+}
+.moveCenter { 
+    -webkit-transition: all 0.7s;
+    left: 0 !important;
+}
+.moveRight { 
+    -webkit-transition: all 0.7s;
+    left: 100% !important;
+}
+.moveFooterDown { 
+    -webkit-transition: all 0.7s;
+    bottom: -35% !important;
+}
+.moveFooterUp { 
+    -webkit-transition: all 0.7s;
+    bottom: 0 !important;
+}

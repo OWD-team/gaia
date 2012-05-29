@@ -106,7 +106,7 @@ input, select {
 .left { float: left; }
 
 html {
-    font-family: arial;
+    font-family: arial !important;
     font-size: 10px;
 }
 body {
@@ -114,78 +114,57 @@ body {
     overflow: hidden;
     /*width: 32rem;
     border-right: 1px solid blue;*/
+    height: 100%;
+    //background: url(images/grid_5x1.png) repeat;
 }
     .grid {
-        background: url(images/grid_8x.png) repeat;
         display: block;
         overflow: hidden;
         width: 100%;
         height: 100%;
+        //background: url(images/column_60.png) repeat-x;
+       //background-color: rgb(255,255,255);
+       margin: 0 auto;
+       width: 29rem;
+       border: 1px solid red;
     }
         .grid p {
-            font-size: 1.6rem;
-            line-height: 1.6rem;
-            padding: 1.6rem 0 0.8rem 2.4rem;
+            font-size: 3rem;
+            line-height: 3rem;
+            padding: 0 0 0.5rem 0;
             color: rgba(0,0,0,0.8);
         }
         .grid ul {
             display: block;
             overflow: hidden;
-            margin-left: 2.4rem;
         }
             .grid ul li {
                 display: block;
                 overflow: hidden;
                 background: rgba(0,0,255,0.4);
                 float: left;
-                margin-left: 1.6rem;
+                margin-left: 1rem;
             }
-            ul.grid-8 li {
-                width: 0.8rem;
-                height: 0.8rem;
-            }
-            ul.grid-16 li {
-                width: 1.6rem;
-                height: 1.6rem;
-            }
-            ul.grid-24 li {
-                width: 2.4rem;
-                height: 2.4rem;
-            }
-            ul.grid-32 li {
-                width: 3.2rem;
-                height: 3.2rem;
-            }
-            ul.grid-48 li {
-                width: 4.8rem;
-                height: 4.8rem;
-            }
-            ul.grid-56 li {
-                width: 5.6rem;
-                height: 5.6rem;
-            }
-            ul.grid-64 li {
-                width: 6.4rem;
-                height: 6.4rem;
-            }
-            ul.grid-136 li {
-                width: 13.6rem;
-                height: 13.6rem;
-            }
-            ul li:first-child {
+            .grid ul li:first-child {
                 margin-left: 0;
             }
+            ul.grid-65 li {
+                width: 6.5rem;
+                height: 60rem;
+                font-size: 6.5rem;
+            }
+            
 
 
-@media screen and (-webkit-device-pixel-ratio: 1.5), screen and (max--moz-device-pixel-ratio: 1.5) {
+/*@media screen and (-webkit-device-pixel-ratio: 1.5), screen and (max--moz-device-pixel-ratio: 1.5) {
     html {
-        font-size: 15px;
+        font-size: 13.3px;
     }
     .grid {
         background: url(images/grid_8x1.5.png) repeat;
     }
 
-}
+}*/
 /*@media screen and (-webkit-device-pixel-ratio: 2), screen and (max--moz-device-pixel-ratio: 2) {
     html {
         -webkit-text-size-adjust: 50%;

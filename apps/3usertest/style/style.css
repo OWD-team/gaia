@@ -1,0 +1,633 @@
+.left { float: left; }
+.right { float: right; }
+.clear { clear: both; }
+.clearL { clear: left; }
+.clearR { clear: right; }
+.dboh { display: block; overflow: hidden } 
+
+li { list-style: none; }
+
+html {
+    font-size: 10px;
+}
+body {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 400;
+}
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700);
+
+/* poneMask only for desktop browsers */
+#phoneMask {
+    width: 373px;
+    height: 632px;
+    display: block;
+    overflow: hidden;
+    background: url(images/phone_mask.png) no-repeat;
+    margin: 10px;
+    position: relative;
+}
+    #phoneMask #phoneMaskLeft {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        left: 33px;
+        top: 561px;
+    }
+    #phoneMask #phoneMaskMiddle {
+        position: absolute;
+        width: 71px;
+        height: 42px;
+        left: 146px;
+        top: 561px;
+    }
+    #phoneMask #phoneMaskRight {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        left: 295px;
+        top: 561px;
+    }
+    
+    #OWD {
+        display: block;
+        overflow: hidden;
+        position: relative;
+        /*background: -webkit-gradient(radial, 500 50%, 500, 300 30%, 0, from(#343a3b), to(#7a868c));
+        background: -moz-radial-gradient( 50rem 25%, circle, #7a868c 0px, #343a3b 50rem);*/
+        background: url(images/girl.png) no-repeat;
+    }
+    #phoneMask #OWD {
+        top: 66px;
+        left: 24px;
+        width: 320px;
+        height: 480px;
+    }
+    #mobile {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+    #mobile #OWD {
+        /*top: -18px;
+        left: 0;
+        width: 320px;
+        height: 480px;*/
+        width: 100%;
+        height: 100%;
+    }
+        #OWD * {
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+#functionality {
+    position: absolute;
+    width: 350px;
+    left: 450px;
+    top: 50px;
+}
+    #functionality h2 {
+        font-size: 20px;
+        padding-bottom: 15px;
+    } 
+    #functionality ul {
+        margin-left: 15px;
+        line-height: 18px;
+    }
+        #functionality li {
+            list-style: disc;
+            padding-bottom: 5px;
+            font-size: 16px;
+        }   
+        
+        #lockScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            overflow: hidden;
+            z-index: 2000;
+            background: url('images/lock.png') no-repeat;
+        }
+            #lockScreen header {
+                position: absolute;
+                top: 0;
+                display: block;
+                overflow: hidden;
+                width: 100%;
+                height: 12rem;
+            }
+                #lockScreen header h2 {
+                    color: #fff;
+                    font-size: 5.6rem;
+                    font-weight: 300;
+                    position: absolute;
+                    left: 1rem;
+                    top: 3rem;
+                }
+                #lockScreen header h3 {
+                    color: #fff;
+                    font-size: 1.6rem;
+                    position: absolute;
+                    left: 1rem;
+                    top: 9rem;
+                }
+            #lockScreen footer {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                display: block;
+                overflow: hidden;
+                z-index: 2010;
+                height: 10rem;
+            }
+                #lockScreen #unlock {
+                    position: absolute;
+                    width: 5.4rem;
+                    height: 5.3rem;
+                    bottom: 2.2rem;
+                    left: 3.3rem;
+                }
+                #lockScreen #lockSlider {
+                    position: absolute;
+                    width: 3.4rem;
+                    height: 3.5rem;
+                    left: 50%;
+                    margin-left: -1.7rem;
+                    bottom: 3.2rem;
+                    z-index: 2020;
+                }
+                #lockScreen #unlockCamera {
+                    position: absolute;
+                    width: 5.4rem;
+                    height: 5.3rem;
+                    bottom: 2.2rem;
+                    right: 3.3rem;
+                }
+
+        #OWD > header {
+            height: 2.5rem;
+            width: 100%;
+            z-index: 1000;
+            position: absolute;
+        }
+            /*#OWD > header .toggle {
+                height: 21px;
+                width: 100%;
+                z-index: 1200;
+                position: absolute;
+                background: #e3e6e7 url('images/notifications_toggle.png') no-repeat;
+                font-size: 12px;
+                color: #333;
+                padding: 0 0 0 24px;
+                line-height: 21px;
+            }*/
+            /*#OWD > header .battery {
+                height: 0.2rem;
+                background: green;
+                width: 80%;
+            }*/
+            #OWD > header #statusBar {
+                height: 2.5rem;
+                background: rgba(0,0,0,0.8);
+                width: 100%;
+                color: #fff;
+            }  
+                #statusBar .coverage {
+                    width: 19px;
+                    height: 10px;
+                    background: url('images/coverage.png') no-repeat;
+                    float: left;
+                    margin: 0.8rem 0.5rem 0 0.8rem;
+                }
+                #statusBar .operator {
+                    font-weight: 600;
+                    color: rgba(255,255,255,0.6);
+                    font-size: 1.2rem;
+                    line-height: 2.8rem;
+                }
+                #statusBar .battery {
+                    float: right;
+                    margin: 0.8rem 1rem 0 0;
+                    background: url('images/battery.png') no-repeat;
+                    width: 19px;
+                    height: 10px;
+                }
+                #statusBar .currentTime {
+                    float: right;
+                    margin-right: 0.8rem;
+                    font-weight: 600;
+                    color: rgba(255,255,255,0.6);
+                    font-size: 1.3rem;
+                    line-height: 2.7rem;
+                }
+                /*#statusBar .slider {
+                    height: 5rem;
+                    width: 5rem;
+                    background: url('images/slider.png') center 0.5rem no-repeat;
+                    display: block;
+                    overflow: hidden;
+                    z-index: 1100;
+                    position: absolute;
+                    top: 0;
+                    left: 50%;
+                    margin-left: -2.5rem;
+                }*/  
+        #OWD #world {
+            overflow: visible !important;
+        }
+        
+        #OWD section.card {
+            float: left; 
+        }
+        
+        #desktop header {
+            width: 100%;
+            height: 1rem;
+        }
+            #desktop header ul.pagination {
+                width: 100%;
+            }
+                #desktop header ul.pagination li {
+                    float: left;
+                    height: 0.3rem;
+                    text-indent: -999px;
+                }
+                #desktop header ul.pagination li.active {
+                    background: #ff7f02;
+                }
+        
+        
+            article.page {
+                position: relative;
+                width: 32rem;
+                float: left;
+                overflow: hidden;
+                //background: url(images/grid_5x1.png) repeat;
+            }
+            article.page.apps {
+                background: rgba(0,0,0,0.5);
+            }
+            article.page li h2 {
+                width: 100%;
+                text-align: center;
+                color: #fff; 
+                font-size: 2.2rem;
+                font-weight: normal;
+                padding: 2rem 0 0.5rem 0;
+                text-shadow: 1px 1px 3px #000;
+            }
+            article.page#home h2 { 
+                float: right;
+                color: #fff;
+                clear: both;
+                font-size: 6rem;
+                font-weight: normal;
+                padding: 6rem 3rem 0 0;
+                text-shadow: 1px 1px 3px #000;
+                text-align: right;
+            }
+            article.page#home h3 {
+                float: right;
+                color: #fff;
+                clear: both;
+                font-size: 2rem;
+                font-weight: normal;
+                padding: 2rem 3.5rem 0 0;
+                text-shadow: 1px 1px 3px #000;
+            }   
+
+            article.page ul.icons {
+                display: block;
+                overflow: hidden;
+                margin: 0 auto;
+                padding: 2rem 0 0 1rem;
+                width: 31rem;
+            }
+                article.page ul.icons li {
+                    width: 6.5rem;
+                    height: 9rem;
+                    text-align: center;
+                    margin-right: 1rem;
+                    position: relative;
+                    float: left;
+                }
+                    article.page ul.icons li img {
+                        width: 5.6rem;  
+                        height: 6rem;
+                    }
+                    article.page ul.icons li span.appNotifications {
+                        font-size: 1.2rem;
+                        line-height: 2rem;
+                        height: 2rem;
+                        width: 2.8rem;
+                        font-weight: 600;
+                        color: #fff;
+                        background-color: #c90202;
+                        position: absolute;
+                        top: -1rem;
+                        left: 50%;
+                        margin-left: -1.1rem;
+                        border-radius: 1rem;
+
+                    }
+                    article.page ul.icons li span.appName {
+                        font-size: 1.2rem;
+                        line-height: 1.6rem;
+                        height: 2.2rem;
+                        width: 6.5rem;
+                        font-weight: 600;
+                        color: #fff;
+                        text-shadow: 0 0.1rem 0.2rem rgba(0,0,0,1);
+                        text-overflow: ellipsis;
+                        -moz-text-overflow: ellipsis;
+                        -webkit-text-overflow: ellipsis;
+                        overflow: hidden;
+                        float: left;
+                        text-align: center;
+                        white-space: nowrap; 
+                    }
+                /*article.page ul.icons li:nth-child(1) {
+                    background: #DDD url('../images/icons/60x60.png') no-repeat;
+                    text-indent: -999px;
+                    
+                }
+                article.page ul.icons li:nth-child(2) {
+                    background: #DDD url('../images/icons/120x120.png') no-repeat;
+                    background-size: 100%;
+                    text-indent: -999px;
+                }
+                article.page ul.icons li:nth-child(3) {
+                    background: #DDD url('../images/icons/240x240.png') no-repeat;
+                    background-size: 100%;
+                    text-indent: -999px;
+                }*/
+                  
+           
+        
+        /*section.card#log {
+            background: url('images/activity.png') center center no-repeat;
+        }*/
+        article.page > section {
+            width: 100%;
+            position: absolute;
+        }
+
+        
+        #OWD > footer {
+            height: 4rem;
+            width: 100%;
+            position: absolute;
+            background: #000;
+            //background: url('images/bottom_nav_1px.png') center center no-repeat;
+            bottom: 0;
+        }
+            #OWD > footer nav ul li {
+                float: left;
+                height: 4rem;
+                width: 25%;
+                text-align: center;
+                color: #eee;
+                text-decoration: none;
+            }
+            #OWD > footer nav ul li.active {
+                color: #5b5b5b;
+            }
+                #OWD > footer nav ul li img {
+                    height: 2.4rem;
+¡                   width: 2.4rem;
+                    margin-top: 0.8rem;
+                }
+    
+            #home footer {
+                /*padding-left: 120px;*/
+                width: 100%;
+                height: 10.4rem;
+                bottom: 0;
+                position: absolute;
+                z-index: 30;
+            }
+                ul#carousel {
+                    /*margin-left: 14rem;*/
+                    /*width: 8rem;*/
+                    height: 10.4rem;
+                    overflow: visible !important;
+                }
+                    ul#carousel .ui-scrollview-view {
+                        height: 10.4rem;
+                    }
+                        ul#carousel li {
+                            float: left;
+                            height: 8.4rem;
+                            width: 9rem;
+                            text-align: center;
+                            position: relative;
+                        }
+                        ul#carousel li img {
+                            height: 8.4rem;
+                            width: 8rem;
+                        }
+                        ul#carousel li.selected {
+                            /*-webkit-transition: all 0.3s ease-in;
+                            -moz-transition: all 0.3s ease-in;
+                            -webkit-transform: scale(1.2); 
+                            -moz-transform: scale(1.2);*/
+                        }
+                        ul#carousel li .todayName {
+                            position: absolute;
+                            font-size: 1.2rem;
+                            color: #fff;
+                            font-weight: 600;
+                            width: 100%;
+                            top: 1.2rem;
+                            left: 0;
+                        }
+                        ul#carousel li .todayNumber {
+                            position: absolute;
+                            font-size: 4.2rem;
+                            color: #525252;
+                            font-weight: 600;
+                            width: 100%;
+                            top: 2.8rem;
+                            left: 0;
+                        }
+                        
+
+                .tooltip {
+                    height: 4.4rem;
+                    width: 9.2rem;
+                    background: url('images/tooltip.png') center center no-repeat;
+                    position: absolute;
+                    bottom: 6.4rem;
+                    text-align: center;
+                    color: #fff;
+                    font-size: 1.8rem;
+                    line-height: 3rem;
+                    left: 50%;
+                    margin-left: -4.6rem;
+                    z-index: 20;
+                    opacity: 0;
+                }
+                .tooltip.show {
+                    -webkit-transition: all 0.5s 0.75s ease-out;
+                    opacity: 1;
+                    bottom: 10.8rem;
+                }
+                .tooltip.hide {
+                    -webkit-transition: all 0.5s ease-out;
+                    opacity: 0;
+                    bottom: 6.4rem;
+                }  
+
+                #carouselPreview {
+                    position: absolute;
+                    width: 32rem;
+                    height: 27.8rem;
+                    opacity: 0;
+                    bottom: 6.4rem;
+                    z-index: 20;
+                }
+                    #carouselPreview section {
+                        position: absolute;
+                        height: 0;
+                        bottom: 4.5rem;
+                        width: 100%;
+                        background: url('images/previewContent.png') no-repeat;
+                    }
+                    #carouselPreview footer {
+                        background: url('images/preview.png') no-repeat;
+                        height: 4.5rem;
+                        position: absolute;
+                        bottom: 0;
+                    }
+                        #carouselPreview footer .arrow {
+                            height: 2.1rem;
+                            width: 2.1rem;
+                            background: url('images/preview_arrow.png') no-repeat;
+                            float: right;
+                            margin: 0.6rem 1.8rem 0 0;
+                            -webkit-transform:rotate(180deg)
+                        }
+                        #carouselPreview footer .name {
+                            float: left;
+                            color: #fff;
+                            font-size: 1.8rem;
+                            font-weight: 400;
+                            margin-left: 1.8rem;
+                            line-height: 3.2rem;
+                        }
+
+                #carouselPreview.hide {
+                    -webkit-transition: all 0.5s ease-out;
+                    opacity: 0;
+                    bottom: 6.4rem;
+                }
+                    #carouselPreview.hide section {
+                        -webkit-transition: all 0.5s ease-out;
+                        height: 0;
+                    }
+                #carouselPreview.show {
+                    -webkit-transition: all 0.5s 0.75s ease-out;
+                    opacity: 1;
+                    bottom: 10.8rem;
+                }
+                #carouselPreview.expand section {
+                    -webkit-transition: all 0.5s ease-out;
+                    height: 23.3rem;
+                }
+                    #carouselPreview.expand footer .arrow {
+                        //-webkit-transition: all 0.5s ease-out;
+                        -webkit-transform:rotate(0)
+                    }
+                #carouselPreview.collapse section {
+                    -webkit-transition: all 0.5s ease-out;
+                    height: 0;
+                }
+                
+        
+    .zoomOut {
+        -webkit-transition: all 0.3s ease-out;
+        -moz-transition: all 0.3s ease-out;
+        -webkit-transform: scale(0.7); 
+        -moz-transform: scale(0.7);
+    }
+        .zoomOut section.card {                     
+            -webkit-transform: scale(0.90); //to allow shadow 
+            -moz-transform: scale(0.90);       
+            border: 10px solid rgba(255,255,255,0.5);
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.5);
+            margin: 0 15px 15px 0;
+        }
+    .zoomIn {
+        -webkit-transition: all 0.3s ease-in;
+        -moz-transition: all 0.3s ease-in;
+        -webkit-transform: scale(1); 
+        -moz-transform: scale(1); 
+    }
+        .zoomIn > div > section {
+            -webkit-transition: all 0.3s ease-in;
+            -moz-transition: all 0.3s ease-in;      
+            -webkit-transform: scale(1);
+            -moz-transform: scale(1);
+            border: 0;
+            border-radius: 0;
+            box-shadow: 0 0 0 rgba(0,0,0,0.5);
+            margin: 0;
+        }
+    
+    #log img {
+        margin: 0 0 0 20px;
+    }
+    
+    /* Notifications */
+    #notifications {
+        width: 100%;
+        display: block;
+        overflow: visible !important;
+        z-index: 900;
+        position: absolute;
+    }
+        #notifications #notificationsPage {
+            width: 100%;
+            height: 100%;
+            display: block;
+            overflow: hidden;
+            position: relative;
+            background: #d6d6d7 url('../images/notifications.png') no-repeat;
+        }    
+        #notifications .slider {
+            height: 5rem;
+            width: 100%;
+            background: url('../images/slider.png') center 3.6rem no-repeat, url('../images/status_bar.png') 0 bottom repeat-x;
+            display: block;
+            overflow: hidden;
+            z-index: 1100;
+            position: absolute;
+            bottom: 0;  
+        }
+        #notifications .wifi {
+            height: 40px;
+            width: 40px;
+            z-index: 1100;
+            position: absolute;
+            top: 24px;
+            left: 12px;
+        }
+               
+.ui-loader {
+    display: none;
+}
+
+
+/* media query for 1.5 resolution */
+@media screen and (-webkit-device-pixel-ratio: 1.5), screen and (max--moz-device-pixel-ratio: 1.5) {
+    html {
+        font-size: 13.3px;
+    }
+}

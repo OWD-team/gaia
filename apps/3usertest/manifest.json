@@ -1,0 +1,39 @@
+{
+  "name": "UserTest",
+  "description": "UserTest",
+  "launch_path": "/",
+  "developer": {
+    "name": "The Gaia Team",
+    "url": "https://github.com/andreasgal/gaia"
+  },
+  "locales": {
+    "ar": {
+      "name": "UserTest",
+      "description": "UserTest"
+    },
+    "de": {
+      "name": "UserTest",
+      "description": "UserTest"
+    },
+    "en-US": {
+      "name": "UserTest",
+      "description": "UserTest"
+    },
+    "fr": {
+      "name": "UserTest",
+      "description": "UserTest"
+    },
+    "ru": {
+      "name": "UserTest",
+      "description": "UserTest"
+    },
+    "zh-TW": {
+      "name": "UserTest",
+      "description": "UserTest"
+    }
+  },
+  "default_locale": "en-US",
+  "icons": {
+    "120": "/style/icons/Calculator.png"
+  }
+}

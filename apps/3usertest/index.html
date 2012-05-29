@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    
+    <title>Home</title>
+    
+    <link rel="stylesheet" href="style/reset.css">
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/Lungo.widgets.icon.css">
+    
+    <script src="js/jquery-1.6.4.min.js"></script>
+    <script src="js/detectmobilebrowser.js"></script> 
+    <script src="js/jquery.mobile-1.1.0.min.js"></script>
+    <script src="js/jquery.easing.1.3.js"></script>
+    <script src="js/jquery.mobile.scrollview.js"></script>
+    <script src="js/scrollview.js"></script>
+    <script src="js/swipe_up_down.js"></script>  
+    <script src="js/jquery-ui/js/jquery-ui-1.8.20.custom.min.js"></script>  
+    <script src="js/script.js"></script>
+</head>
+<body>
+    
+    <div id="OWD">
+
+        <section id="lockScreen">
+            <header>
+                <h2 class="currentTime"></h2>
+                <h3 class="currentDate"></h3>
+            </header>
+            <footer>
+                <img id="unlock" src="style/images/lock_lock.png" alt="Unlock" />
+                <img id="lockSlider" src="style/images/lock_slider.png" alt="Slide to unlock" />
+                <img id="unlockCamera" src="style/images/lock_Camera.png" alt="Unlock Camera app" />
+            </footer>
+        </section>
+
+        <header>
+            <!--div class="toggle"></div-->
+            <div class="battery"></div>
+            <div id="statusBar">
+                <span class="coverage"></span>
+                <span class="operator">movistar</span>
+                <!--div class="slider"></div-->
+                <span class="currentTime"></span>
+                <span class="battery"></span>
+            </div>
+        </header>
+        
+        <div id="world" data-scroll="xp">
+            <section id="desktop" class="card" data-scroll="xp">        
+                <article class="page" id="home">
+                    <footer>
+                        <ul id="carousel" data-scroll="xp"> 
+                            <li><img src="style/images/icons/carousel/path.png" alt="Path" /></li>
+                            <li><img src="style/images/icons/carousel/mozilla.png" alt="Store" /></li>
+                            <li><img src="style/images/icons/carousel/facebook.png" alt="Facebook"/></li>
+                            <li>
+                                <img src="style/images/icons/carousel/calendar_blank.png" alt="Calendar" />
+                                <span class="todayName"></span>
+                                <span class="todayNumber"></span>
+                            </li>
+                            <li><img src="style/images/icons/carousel/radio.png" alt="Radio" /></li>
+                            <li><img src="style/images/icons/carousel/email.png" alt="Email" /></li>
+                            <li><img src="style/images/icons/carousel/empty.png" /></li>
+                            <li><img src="style/images/icons/carousel/empty.png" /></li>
+                            <li><img src="style/images/icons/carousel/empty.png" /></li>
+                        </ul>
+                    </footer>
+                    <aside>
+                        <span class="tooltip"></span>
+                        <div id="carouselPreview">
+                            <section></section>
+                            <footer>
+                                <span class="name">Facebook</span>
+                                <span class="arrow"></span>
+                            </footer>
+                        </div>
+                    </aside>
+                </article>
+        
+                <article class="page apps" id="apps-1">
+                    <ul class="icons">       
+                        <li>
+                            <span class="appNotifications">10</span>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/angry_birds.png" />
+                            <span class="appName">Angry Birds</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/flickr.png" />
+                            <span class="appName">Flickr</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/skype.png" />
+                            <span class="appName">Skype</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/shazam.png" />
+                            <span class="appName">Shazam</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/beluga.png" />
+                            <span class="appName">Beluga</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/into_now.png" />
+                            <span class="appName">Into_now</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/flipboard.png" />
+                            <span class="appName">Flipboard</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                    </ul>
+                </article>
+                <article class="page apps" id="apps-2">
+                    <ul class="icons">       
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                        <li>
+                            <img src="style/images/icons/firefox.png" />
+                            <span class="appName">Firefox</span>
+                        </li>
+                    </ul>
+                </article>
+            </section>
+            
+            <section id="log" class="card">
+                <article class="page">
+                </article>
+            </section>
+        </div> <!-- /world -->
+        
+        <footer>
+            <nav id="softKeys">
+                <ul>
+                    <li><img src="style/images/icons/coms.png" alt="Coms" /></li>
+                    <li><img src="style/images/icons/contacts.png" alt="Contacts" /></li>
+                    <li><img src="style/images/icons/messaging.png" alt="Messaging" /></li>
+                    <li><img src="style/images/icons/phone.png" alt="Phone" /></li>
+                </ul>
+            </nav>
+        </footer>
+    </div> <!-- /OWD -->
+</body>
+</html>
