@@ -594,6 +594,7 @@ const IMEController = (function() {
       if (callback)
         IMERender.ime.addEventListener(event, callback.bind(this));
     }
+    var surface = new eal.Surface(IMERender.ime, function () { return _currentKey; });
   }
 
   function _uninit() {
