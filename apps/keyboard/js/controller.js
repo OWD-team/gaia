@@ -594,7 +594,9 @@ const IMEController = (function() {
       if (callback)
         IMERender.ime.addEventListener(event, callback.bind(this));
     }
-    var surface = new eal.Surface(IMERender.ime, function () { return _currentKey; });
+    var surface = new eal.Surface(IMERender.ime, {isArea: function () { 
+      return _currentKey.tagName === 'BUTTON' ? _currentKey : null; }}
+    );
   }
 
   function _uninit() {
