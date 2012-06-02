@@ -103,6 +103,7 @@ var _defaults = {
 
   getArea: _defaultIsArea,
 
+  async: false,
   touch: logEvent,
   press: logEvent,
   longpress: logEvent,
@@ -214,7 +215,10 @@ function _handleAbstractEvents(evts) {
     // event callback
     fn = _options[evt.type];
     if (typeof fn === 'function')
-      fn(evt);
+      if (_options.async)
+        window.setTimeout(function () { fn(evt); }, 0);
+      else
+        fn(evt);
   }
 }
 
