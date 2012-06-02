@@ -97,9 +97,10 @@ const IMEManager = {
     if (this.keyboards.indexOf(IMEController.currentKeyboard) === -1)
         IMEController.currentKeyboard = this.keyboards[0];
 
-    this.keyboards.forEach((function loadIMEngines(name) {
+/*    this.keyboards.forEach((function loadIMEngines(name) {
       IMEController.loadKeyboard(name);
     }).bind(this));
+*/
   },
 
   _events: ['unload', 'resize'],

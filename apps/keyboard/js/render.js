@@ -1,3 +1,5 @@
+'use strict';
+
 const IMERender = (function() {
 
   var ime, menu;

@@ -19,12 +19,11 @@ function clone(obj, deep) {
 }
 
 const eal = {};
-
 (function () {
 
 /*
  * Surface EAL provides basic surface events:
- *  touch, press, longPress, tap, doubleTap, enterarea, leavearea, release, changearea
+ *  touch, pressarea, longpress, keeppressing, tap, doubletap, enterarea, leavearea, release, changearea
  *
  * Surfaces are compound by areas. When constructing a surface you can optionally pass 
  * a function that receives the target of the event and must return the area for that 
@@ -33,7 +32,7 @@ const eal = {};
  * Events:
  * -------
  *  * __touch__ event is triggered when the surface is pressed for the first time
- *  * __press__ event is triggered just after entering a new area (see __enterarea__ event)
+ *  * __pressarea__ event is triggered just after entering a new area (see __enterarea__ event)
  *  * __longpress__ (optional) event is triggered when (and only once) the same area is touch during more than longPressDelay
  *  * __keeppressing__ (optional) event is triggered when keeping pressing the same area in intervals of keepPressingInterval
  *  * __tap__ event is triggered when an area is touch and the surface is released without changing the area
@@ -78,11 +77,11 @@ function logEvent(evt) {
     break;
 
     case 'changearea':
-      console.log(evt.type+': from '+evt.fromArea.textContent+' to '+evt.area.textContent);
+      console.log(evt.type+': from '+evt.detail.fromArea.textContent+' to '+evt.detail.area.textContent);
     break;
 
     default:
-      console.log(evt.type+': '+evt.area.textContent);
+      console.log(evt.type+': '+evt.detail.area.textContent);
     break;
   }
 }
@@ -91,197 +90,196 @@ function _defaultIsArea(htmlElement) {
   return htmlElement;
 }
 
-var _longPressTimer, _doubleTapTimer, _keepPressingInterval;
-var _isWaitingForSecondTap = false;
-var _hasMoved;
-var _enterArea, _currentArea;
-var _options;
 var _defaults = {
   longPressDelay: 700,
   doubleTapTimeout: 700,
   keepPressingInterval: 100,
 
   getArea: _defaultIsArea,
-
-  async: false,
-  touch: logEvent,
-  press: logEvent,
-  longpress: logEvent,
-  tap: logEvent,
-  doubletap: logEvent,
-  enterarea: logEvent,
-  leavearea: logEvent,
-  release: logEvent,
-  changearea: logEvent,
-  keeppressing: logEvent,
 };
 
-function Event(base, type, area, from) {
-  // TODO: include more info from base evt?
-  extend(this, base);
-  this.type = type; 
-  this.area = area || base.area || base.target || null;
-  this.moved = _hasMoved || base.moved || false;
-  this.enterArea = _enterArea;
-  if (type == 'changearea')
-    this.fromArea = from || null;
-}
+eal.Surface = function(surfaceElement, spec) {
 
-function _reset() {
-  _hasMoved = false;
-  _enterArea = null;
-}
+  var _longPressTimer, _doubleTapTimer, _keepPressingInterval;
+  var _isWaitingForSecondTap = false;
+  var _hasMoved;
+  var _enterArea, _currentArea, _formerArea;
+  var _options;
 
-// some events generate other events
-function _addSynteticEvents(evts) {
-  var newEvt, evt, type;
-  for (var i = 0; evt = evts[i]; i += 1) {
-    newEvt = null;
-    switch (evt.type) {
-      case 'enterarea':
-        // enter area generate press
-        newEvt = new Event(evt, 'press');
-      break;
+  function _newEvent(base, type, area, from) {
+    var newEvent = new CustomEvent(type, {
+      bubbles: true,
+      cancelable: true,
+      detail: {
+        area: area || base.detail.area || base.target || null,
+        moved: _hasMoved || base.detail.moved || false,
+        enterArea: _enterArea,
+        fromArea: from || null
+      }
+    });
 
-      case 'leavearea':
-        // interrumpt long press
-        window.clearTimeout(_longPressTimer);
-        window.clearInterval(_keepPressingInterval);
-      break;
+    return newEvent;
+  }
 
-      case 'release':
-        // release, if in area, generates a tap
-        if (_currentArea) {
+  function _reset() {
+    _hasMoved = false;
+  }
 
-          // waiting for second tap -> generate the double tap
-          if (_isWaitingForSecondTap) {
-            newEvt = new Event(evt, 'doubletap', _currentArea);
+  // some events generate other events
+  function _addSynteticEvents(evts) {
+    var newEvt, evt, type;
+    for (var i = 0; evt = evts[i]; i += 1) {
+      newEvt = null;
+      switch (evt.type) {
+        case 'enterarea':
+          // enter area generate press
+          newEvt = _newEvent(evt, 'pressarea');
+        break;
 
-            _isWaitingForSecondTap = false;
+        case 'leavearea':
+          // interrumpt long press
+          window.clearTimeout(_longPressTimer);
+          window.clearInterval(_keepPressingInterval);
+        break;
 
-          // not waiting -> generates a tap and now waiting no more than doubleTapTimeout
-          } else {
-            newEvt = new Event(evt, 'tap', _currentArea);
+        case 'release':
+          // release, if in area, generates a tap
+          if (_currentArea) {
 
-            _isWaitingForSecondTap = true;
-            window.clearTimeout(_doubleTapTimer);
-            _doubleTapTimer = window.setTimeout(
-              function () { _isWaitingForSecondTap = false; },
-              _options.doubleTapTimeout
+            // waiting for second tap -> generate the double tap
+            if (_isWaitingForSecondTap && evt.area === _formerArea) {
+              newEvt = _newEvent(evt, 'doubletap', _currentArea);
+
+              _isWaitingForSecondTap = false;
+
+            // not waiting -> generates a tap and now waiting no more than doubleTapTimeout
+            } else {
+              newEvt = _newEvent(evt, 'tap', _currentArea);
+
+              _isWaitingForSecondTap = true;
+              window.clearTimeout(_doubleTapTimer);
+              _doubleTapTimer = window.setTimeout(
+                function () { _isWaitingForSecondTap = false; },
+                _options.doubleTapTimeout
+              );
+            }
+          }
+
+        break;
+
+        case 'pressarea':
+          // set timeout up for long press
+          if (_options.longPressDelay) {
+            var longPress = _newEvent(evt, 'longpress');
+            window.clearTimeout(_longPressTimer);
+            _longPressTimer = window.setTimeout(
+              function () {
+                _handleAbstractEvents([longPress]);
+              },
+              _options.longPressDelay
             );
           }
-        }
+        break;
 
-      break;
+        case 'longpress':
+          // set interval for keep pressing
+          if (_options.keepPressingInterval) {
+            var keepPressing = _newEvent(evt, 'keeppressing');
+            _keepPressingInterval = window.setInterval(
+              function () {
+                _handleAbstractEvents([keepPressing]);
+              },
+              _options.keepPressingInterval
+            );
+          }
+        break;
 
-      case 'press':
-        // set timeout up for long press
-        if (_options.longPressDelay) {
-          var longPress = new Event(evt, 'longpress');
-          window.clearTimeout(_longPressTimer);
-          _longPressTimer = window.setTimeout(
-            function () {
-              _handleAbstractEvents([longPress]);
-            },
-            _options.longPressDelay
-          );
-        }
-      break;
+      }
 
-      case 'longpress':
-        // set interval for keep pressing
-        if (_options.keepPressingInterval) {
-          var keepPressing = new Event(evt, 'keeppressing');
-          _keepPressingInterval = window.setInterval(
-            function () {
-              _handleAbstractEvents([keepPressing]);
-            },
-            _options.keepPressingInterval
-          );
-        }
-      break;
+      if (newEvt)
+        evts.splice(i+1, 0, newEvt);
+    }
+  }
 
+  function _handleAbstractEvents(evts) {
+    var fn;
+    _addSynteticEvents(evts);   // improve performance by adding this to the loop
+    for (var i = 0, evt; evt = evts[i]; i += 1) {
+      // event callback
+      logEvent(evt);
+      evt.detail.area.dispatchEvent(evt);
+    }
+  }
+
+  function _onMouseDown(evt) {
+    _debugBasicEvents && console.log('--> mousedown');
+
+    var abstractEvts = [_newEvent(evt, 'touch')];
+    var newArea = _options.isArea(evt.target);
+    if (newArea) {
+      _formerArea = _currentArea;
+      _enterArea = _currentArea = newArea;
+      abstractEvts.push(
+        _newEvent(evt, 'enterarea', _currentArea)
+      );
     }
 
-    if (newEvt)
-      evts.splice(i+1, 0, newEvt);
+    _handleAbstractEvents(abstractEvts, evt);
   }
-}
 
-function _handleAbstractEvents(evts) {
-  var fn;
-  _addSynteticEvents(evts);   // improve performance by adding this to the loop
-  for (var i = 0, evt; evt = evts[i]; i += 1) {
-    // event callback
-    fn = _options[evt.type];
-    if (typeof fn === 'function')
-      if (_options.async)
-        window.setTimeout(function () { fn(evt); }, 0);
-      else
-        fn(evt);
-  }
-}
+  function _onMouseLeave(evt) {
+    _debugBasicEvents && console.log('--> mouseleave');
 
-function _onMouseDown(evt) {
-  _debugBasicEvents && console.log('--> mousedown');
+    var abstractEvts = [];
+    if (_currentArea) {
+      abstractEvts.push(
+        _newEvent(evt, 'leavearea', _currentArea)
+      );
+    }
 
-  var abstractEvts = [new Event(evt, 'touch')];
-  var newArea = _options.isArea(evt.target);
-  if (newArea) {
-    _enterArea = _currentArea = newArea;
     abstractEvts.push(
-      new Event(evt, 'enterarea', _currentArea)
+      _newEvent(evt, 'release')
     );
+
+    _handleAbstractEvents(abstractEvts, evt);
+    _reset();
   }
 
-  _handleAbstractEvents(abstractEvts, evt);
-}
+  function _onMouseMove(evt) {
+    _debugBasicEvents && console.log('--> mousemove');
 
-function _onMouseLeave(evt) {
-  _debugBasicEvents && console.log('--> mouseleave');
+    // ignore moving when not transitioning to another area
+    // (leaving to a dead zone or remain in the same area)
+    var newArea = _options.isArea(evt.target);
+    if (!newArea || _currentArea === newArea)
+      return;
 
-  var abstractEvts = [];
-  if (_currentArea) {
-    abstractEvts.push(
-      new Event(evt, 'leavearea', _currentArea)
-    );
+    _hasMoved = true;
+    var abstractEvts = [
+      _newEvent(evt, 'leavearea', _currentArea),
+      _newEvent(evt, 'changearea', newArea, _currentArea),
+      _newEvent(evt, 'enterarea', newArea)
+    ];
+
+    _formerArea = _currentArea;
+    _currentArea = newArea;
+    _handleAbstractEvents(abstractEvts);
   }
 
-  abstractEvts.push(
-    new Event(evt, 'release')
-  );
-
-  _handleAbstractEvents(abstractEvts, evt);
-  _reset();
-}
-
-function _onMouseMove(evt) {
-  _debugBasicEvents && console.log('--> mousemove');
-
-  // ignore moving when not transitioning to another area
-  // (leaving to a dead zone or remain in the same area)
-  var newArea = _options.isArea(evt.target);
-  if (!newArea || _currentArea === newArea)
-    return;
-
-  _hasMoved = true;
-  var abstractEvts = [
-    new Event(evt, 'leavearea', _currentArea),
-    new Event(evt, 'changearea', newArea, _currentArea),
-    new Event(evt, 'enterarea', newArea)
-  ];
-
-  _currentArea = newArea;
-  _handleAbstractEvents(abstractEvts);
-}
-
-eal.Surface = function(surfaceElement, spec) {
   spec = spec || {};
   _options = extend({}, _defaults, spec);
   surfaceElement.addEventListener('mousedown', _onMouseDown);
   surfaceElement.addEventListener('mouseup', _onMouseLeave);
   surfaceElement.addEventListener('mousemove', _onMouseMove);
   surfaceElement.addEventListener('mouseleave', _onMouseLeave);
+
+  // set options
+  this.set = function(newSpec) {
+    extend(_options, newSpec);
+  }
+
+  _hasMoved = false;
+  _currentArea = _enterArea = _formerArea = null;
 }
 
 })();
