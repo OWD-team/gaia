@@ -162,7 +162,7 @@ const IMEController = (function() {
     doubletap: _onDoubleTap,
 
     // manage repetition
-//    keeppressing: 
+    keeppressing: _onKeepPressing
   }
 
   function _init() {
