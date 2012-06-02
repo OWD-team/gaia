@@ -7,6 +7,7 @@
 
 const IMEController = (function() {
   var _currentKeyboard, _currentInputType, _currentKey;
+  var _formerLayout, _currentLayout;
   var _surface;
 
   function _mapType(type) {
@@ -38,25 +39,31 @@ const IMEController = (function() {
     parent.postMessage(JSON.stringify(resizeAction), '*');
   }
 
+  function _setLayout(layout) {
+    _formerLayout = _currentLayout;
+    _currentLayout = layout;
+    IMERender.draw(_currentLayout);
+  }
+
   function _getKey(keyHTMLElement) {
     var r = keyHTMLElement.dataset.row;
     var c = keyHTMLElement.dataset.column;
     var a = keyHTMLElement.dataset.alternative;
     if (a !== undefined)
-      return Keyboards[_currentKeyboard].keys[r][c].alternatives[a];
+      return _currentLayout.keys[r][c].alternatives[a];
     else
-      return Keyboards[_currentKeyboard].keys[r][c];
+      return _currentLayout.keys[r][c];
   }
 
   function UnexpectedKeyCode() {
     this.name = 'UnexpectedKeyCode';
-    this.message = 'KeyCodes can only be arrays ([...]) or strings ("...")';
+    this.message = 'KeyCodes can only be arrays ([...]), strings ("...") or supported actions';
   }
 
   function _flatCodes(str) {
     var keyCodes = [];
     switch (typeof str) {
-      // as it is if number
+      // do not process if number
       case 'number':
         keyCodes.push(str);
       break;
@@ -74,9 +81,12 @@ const IMEController = (function() {
           str.forEach(function(item) {
             Array.prototype.push.apply(keyCodes, _flatCodes(item));
           });
+
+        // special object: changeto
         } else {
-          throw new UnexpectedKeyCode();
+            keyCodes.push(str);
         }
+
       break;
 
       // other types not supported
@@ -106,37 +116,54 @@ const IMEController = (function() {
       codes = [codes];
 
     codes = _flatCodes(codes);
-    codes.forEach(function(code) { console.log('toSend: '+code);});
 
     // send codes
     for (var i = 0, l = codes.length, keyCode; i < l; i += 1) {
       keyCode = codes[i];
-      switch (keyCode) {
-        case KeyEvent.DOM_VK_BACK_SPACE:
-        case KeyEvent.DOM_VK_RETURN:
-          window.navigator.mozKeyboard.sendKey(keyCode, 0);
-          break;
 
-        default:
-          window.navigator.mozKeyboard.sendKey(0, keyCode);
-          break;
+      // special action
+      if (typeof keyCode === 'object') {
+
+        // changeto action changes the layout
+        if (keyCode.changeto !== undefined) {
+          _setLayout(Keyboards[keyCode.changeto]);
+
+        } else {
+          throw {name:'UnexpectedAction', message:'Action not recognized for this key'};
+        }
+
+      // default keyCode
+      } else {
+        switch (keyCode) {
+          case KeyEvent.DOM_VK_BACK_SPACE:
+          case KeyEvent.DOM_VK_RETURN:
+            window.navigator.mozKeyboard.sendKey(keyCode, 0);
+            break;
+
+          default:
+            window.navigator.mozKeyboard.sendKey(0, keyCode);
+            break;
+        }
       }
     }
   }
 
+  // send codes
   function _onTap(evt) {
     var area = evt.target;
     var key = _getKey(area);
     _sendCodes(key);
   }
 
+  // if repeat is enabled for the key, send codes
   function _onKeepPressing(evt) {
-    var area = evt.area;
+    var area = evt.target;
     var key = _getKey(area);
     if (key.repeat)
       _sendCodes(key);
   }
 
+  // send codes of the double tap
   function _onDoubleTap(evt) {
     var area = evt.target;
     var key = _getKey(area);
@@ -198,6 +225,7 @@ const IMEController = (function() {
 
     set currentKeyboard(value) {
       _currentKeyboard = value;
+      _setLayout(Keyboards[_currentKeyboard]);
     },
 
     showIME: function(type) {
@@ -213,7 +241,7 @@ const IMEController = (function() {
       // we presume that the targetWindow has been restored by
       // window manager to full size by now.
       IMERender.getTargetWindowMetrics();
-      IMERender.draw(Keyboards[_baseLayout]);
+      IMERender.draw(_currentLayout);
       _updateTargetWindowHeight();
     }
   };
