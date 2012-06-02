@@ -34,7 +34,8 @@ const eal = {};
  * -------
  *  * __touch__ event is triggered when the surface is pressed for the first time
  *  * __press__ event is triggered just after entering a new area (see __enterarea__ event)
- *  * __longpress__ event is triggered when (and only once) the same area is touch during more than longPressDelay
+ *  * __longpress__ (optional) event is triggered when (and only once) the same area is touch during more than longPressDelay
+ *  * __keeppressing__ (optional) event is triggered when keeping pressing the same area in intervals of keepPressingInterval
  *  * __tap__ event is triggered when an area is touch and the surface is released without changing the area
  *  * __doubletap__ event is triggered when an area is touch for a second time before doubleTapTimeout
  *  * __enterarea__ event is triggered when entering a new area
@@ -90,7 +91,7 @@ function _defaultIsArea(htmlElement) {
   return htmlElement;
 }
 
-var _longPressTimer, _doubleTapTimer;
+var _longPressTimer, _doubleTapTimer, _keepPressingInterval;
 var _isWaitingForSecondTap = false;
 var _hasMoved;
 var _enterArea, _currentArea;
@@ -98,6 +99,8 @@ var _options;
 var _defaults = {
   longPressDelay: 700,
   doubleTapTimeout: 700,
+  keepPressingInterval: 100,
+
   getArea: _defaultIsArea,
 
   touch: logEvent,
@@ -108,7 +111,8 @@ var _defaults = {
   enterarea: logEvent,
   leavearea: logEvent,
   release: logEvent,
-  changearea: logEvent
+  changearea: logEvent,
+  keeppressing: logEvent,
 };
 
 function Event(base, type, area, from) {
@@ -141,6 +145,7 @@ function _addSynteticEvents(evts) {
       case 'leavearea':
         // interrumpt long press
         window.clearTimeout(_longPressTimer);
+        window.clearInterval(_keepPressingInterval);
       break;
 
       case 'release':
@@ -170,14 +175,29 @@ function _addSynteticEvents(evts) {
 
       case 'press':
         // set timeout up for long press
-        var longPress = new Event(evt, 'longpress');
-        window.clearTimeout(_longPressTimer);
-        _longPressTimer = window.setTimeout(
-          function () {
-            _handleAbstractEvents([longPress]);
-          },
-          _options.longPressDelay
-        );
+        if (_options.longPressDelay) {
+          var longPress = new Event(evt, 'longpress');
+          window.clearTimeout(_longPressTimer);
+          _longPressTimer = window.setTimeout(
+            function () {
+              _handleAbstractEvents([longPress]);
+            },
+            _options.longPressDelay
+          );
+        }
+      break;
+
+      case 'longpress':
+        // set interval for keep pressing
+        if (_options.keepPressingInterval) {
+          var keepPressing = new Event(evt, 'keeppressing');
+          _keepPressingInterval = window.setInterval(
+            function () {
+              _handleAbstractEvents([keepPressing]);
+            },
+            _options.keepPressingInterval
+          );
+        }
       break;
 
     }
