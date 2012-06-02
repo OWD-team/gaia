@@ -71,8 +71,8 @@ var _debugBasicEvents = false;
 
 function logEvent(evt) {
   switch (evt.type) {
-    case 'touch':
-    case 'release':
+    case 'touchsurface':
+    case 'releasesurface':
       console.log(evt.type);
     break;
 
@@ -142,12 +142,13 @@ eal.Surface = function(surfaceElement, spec) {
           window.clearInterval(_keepPressingInterval);
         break;
 
-        case 'release':
+        case 'releasesurface':
           // release, if in area, generates a tap
           if (_currentArea) {
 
             // waiting for second tap -> generate the double tap
-            if (_isWaitingForSecondTap && evt.area === _formerArea) {
+            console.log('waiting: '+_isWaitingForSecondTap);
+            if (_isWaitingForSecondTap && _currentArea === _formerArea) {
               newEvt = _newEvent(evt, 'doubletap', _currentArea);
 
               _isWaitingForSecondTap = false;
@@ -214,7 +215,7 @@ eal.Surface = function(surfaceElement, spec) {
   function _onMouseDown(evt) {
     _debugBasicEvents && console.log('--> mousedown');
 
-    var abstractEvts = [_newEvent(evt, 'touch')];
+    var abstractEvts = [_newEvent(evt, 'touchsurface')];
     var newArea = _options.isArea(evt.target);
     if (newArea) {
       _formerArea = _currentArea;
@@ -238,7 +239,7 @@ eal.Surface = function(surfaceElement, spec) {
     }
 
     abstractEvts.push(
-      _newEvent(evt, 'release')
+      _newEvent(evt, 'releasesurface')
     );
 
     _handleAbstractEvents(abstractEvts, evt);

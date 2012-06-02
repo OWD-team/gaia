@@ -125,7 +125,7 @@ const IMEController = (function() {
   }
 
   function _onTap(evt) {
-    var area = evt.area;
+    var area = evt.target;
     var key = _getKey(area);
     _sendCodes(key);
   }
@@ -138,21 +138,31 @@ const IMEController = (function() {
   }
 
   function _onDoubleTap(evt) {
-    var area = evt.area;
+    var area = evt.target;
     var key = _getKey(area);
     _sendCodes(key, 'doubletap');
   }
   
   var _imeEvents = {
+
+    // hightlight on enter area
     enterarea: function (evt) {
       IMERender.highlightKey(evt.target);
     },
 
+    // unhighlight on leaving area
     leavearea: function (evt) {
       IMERender.unHighlightKey(evt.target);
     },
 
-    tap: _onTap
+    // send codes on tap
+    tap: _onTap,
+
+    // manage double tap
+    doubletap: _onDoubleTap,
+
+    // manage repetition
+//    keeppressing: 
   }
 
   function _init() {
