@@ -125,7 +125,6 @@ function Event(base, type, area, from) {
 function _reset() {
   _hasMoved = false;
   _enterArea = null;
-  _isWaitingForSecondTap = false;
 }
 
 // some events generate other events
@@ -143,7 +142,6 @@ function _addSynteticEvents(evts) {
         // interrumpt long press
         window.clearTimeout(_longPressTimer);
       break;
-
 
       case 'release':
         // release, if in area, generates a tap
