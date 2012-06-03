@@ -35,7 +35,7 @@ const IMERender = (function() {
         }
         var ratio = key.ratio || 1;
         var keyWidth = (ratio * 100) / layoutWidth;
-        content += buildKey(nrow, ncolumn, code, keyChar, className, keyWidth, alt);
+        content += buildKey(key, keyWidth);
 
       }));
       content += '</div>';
@@ -57,7 +57,7 @@ const IMERender = (function() {
     key.classList.remove('highlighted');
   };
 
-  var showAlternativesCharMenu = function km_showAlternativesCharMenu(key, altChars) {
+  var showAlternativesCharMenu = function km_showAlternativesCharMenu(key, keyObject, altChars) {
     var target = key;
     var cssWidth = target.style.width;
     var left = (window.innerWidth / 2 > target.offsetLeft);
@@ -67,21 +67,24 @@ const IMERender = (function() {
       this.menu.style.left = target.offsetLeft + 'px';
       this.menu.style.right = 'auto';
       this.menu.style.textAlign = 'center';
-      altCharsCurrent.push(key.innerHTML);
+      altCharsCurrent.push(keyObject);
       altCharsCurrent = altCharsCurrent.concat(altChars);
     } else {
       var width = '-moz-calc(' + window.innerWidth + 'px - ' + target.offsetLeft + 'px - ' + target.style.width + ' )';
       this.menu.style.right = width;
       this.menu.style.left = 'auto';
       this.menu.style.textAlign = 'center';
-      altCharsCurrent = altChars.reverse();
-      altCharsCurrent.push(key.innerHTML);
+      altCharsCurrent = altChars.slice(0).reverse();
+      altCharsCurrent.push(keyObject);
     }
 
     var content = '';
-    altCharsCurrent.forEach(function(keyChar) {
-      content += buildKey(-1, -1, keyChar.charCodeAt(0), keyChar, '', cssWidth);
+    altCharsCurrent.forEach(function(key) {
+      content += buildKey(key, cssWidth);
+      console.log(content);
+      console.log('----------------');
     });
+    console.log(content);
 
     this.menu.innerHTML = content;
     this.menu.style.display = 'block';
@@ -101,14 +104,14 @@ const IMERender = (function() {
   // Private Methods
   //
 
-  var buildKey = function buildKey(row, column, code, label, className, width, alt) {
+  var buildKey = function buildKey(key, width) {
     width -= 1;
-    return '<button class="keyboard-key ' + className + '"' +
-      ' data-row="' + row + '"' +
-      ' data-column="' + column + '"' +
-      ' data-keycode="' + code + '"' +
+    return '<button class="keyboard-key"' +
+      ' data-row="' + key.id.row + '"' +
+      ' data-column="' + key.id.column + '"' +
+      (key.id.alternative !== undefined? ' data-alternative="' + key.id.alternative + '"' : '') +
       ' style="width:' + width + '%"' +
-    '>' + label + '</button>';
+    '>' + key.value + '</button>';
   };
 
   return {

@@ -137,7 +137,7 @@ eal.Surface = function(surfaceElement, spec) {
         break;
 
         case 'leavearea':
-          // interrumpt long press
+          // interrumpt long press and keep pressing
           window.clearTimeout(_longPressTimer);
           window.clearInterval(_keepPressingInterval);
         break;
@@ -165,6 +165,9 @@ eal.Surface = function(surfaceElement, spec) {
             }
           }
 
+          // interrumpt long press and keep pressing
+          window.clearTimeout(_longPressTimer);
+          window.clearInterval(_keepPressingInterval);
         break;
 
         case 'pressarea':

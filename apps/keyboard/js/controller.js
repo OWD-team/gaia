@@ -179,15 +179,22 @@ const IMEController = (function() {
 
   // send codes
   function _onTap(evt) {
-    var area = evt.target;
-    var key = _getKey(area);
+    var key = _getKey(evt.target);
     _sendCodes(key);
+  }
+
+  // show alternatives
+  function _onLongPress(evt) {
+    var key = _getKey(evt.target);
+    if (!key.alternatives.length)
+      return;
+
+    IMERender.showAlternativesCharMenu(evt.target, key, key.alternatives);
   }
 
   // if repeat is enabled for the key, send codes
   function _onKeepPressing(evt) {
-    var area = evt.target;
-    var key = _getKey(area);
+    var key = _getKey(evt.target);
     if (key.repeat) {
       IMEFeedback.triggerFeedback();
       _sendCodes(key);
@@ -196,8 +203,7 @@ const IMEController = (function() {
 
   // send codes of the double tap
   function _onDoubleTap(evt) {
-    var area = evt.target;
-    var key = _getKey(area);
+    var key = _getKey(evt.target);
     _sendCodes(key, 'doubletap');
   }
 
@@ -228,7 +234,10 @@ const IMEController = (function() {
     keeppressing: _onKeepPressing,
 
     // triggers feedback
-    pressarea: _onPressArea
+    pressarea: _onPressArea,
+
+    // show alternatives
+    longpress: _onLongPress
   }
 
   function _init() {
@@ -273,18 +282,24 @@ const IMEController = (function() {
   function _expandLayout(layout) {
 
     // expand key
-    function expandKey(key) {
+    function expandKey(key, row, column) {
       if (key.value === undefined)
         throw {name:'MissedValue', message:'value entry is mandatory for keys.'};
 
       var altOptions, alternativeKeys = [];
 
-      // set value for alt key
+      // set value for alternative key
       if (typeof key.keyCode === 'object' && key.keyCode.switchAlternative) {
         key.value = (_inAlternativeMode ? key.keyCode.altValue : key.value) || key.value;
         console.log(_inAlternativeMode);
         console.log(key.value);
       }
+
+      // set id
+      key.id = {
+        row: row,
+        column: column
+      };
 
       // get keycodes
       key.keyCodes = _flatCodes(key.keyCodes || key.keyCode || key.value);
@@ -299,10 +314,15 @@ const IMEController = (function() {
 
         for (var a = 0, alt; alt = altOptions[a]; a += 1) {
           alternativeKeys.push({
-            keyCodes: [alt],
-            keyValue: alt,
+            keyCodes: _flatCodes(alt),
+            value: alt,
             doubletap: '',
-            repeat: false
+            repeat: false,
+            id: {
+              row: row,
+              column: column,
+              alternative: a
+            }
           });
         }
         key.alternatives = alternativeKeys;
@@ -353,7 +373,7 @@ const IMEController = (function() {
       // expand keys
       for (var c = 0, key; key = row[c]; c += 1) {
         k = clone(resolveKey(key, r, c)); // never touch original
-        row[c] = expandKey(k);
+        row[c] = expandKey(k, r, c);
       }
     }
   }
