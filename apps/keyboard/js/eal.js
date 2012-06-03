@@ -147,7 +147,6 @@ eal.Surface = function(surfaceElement, spec) {
           if (_currentArea) {
 
             // waiting for second tap -> generate the double tap
-            console.log('waiting: '+_isWaitingForSecondTap);
             if (_isWaitingForSecondTap && _currentArea === _formerArea) {
               newEvt = _newEvent(evt, 'doubletap', _currentArea);
 

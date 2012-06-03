@@ -50,6 +50,8 @@ const IMEManager = {
   // TODO: gaia issue 347, better setting UI and setting data store
   keyboardSettingGroups: {
     'english': ['en'],
+
+/* XXX: not yet implemented
     'dvorak': ['en-Dvorak'],
     'otherlatins': ['fr', 'de', 'nb', 'sk', 'tr'],
     'cyrillic': ['ru', 'sr-Cyrl'],
@@ -58,6 +60,7 @@ const IMEManager = {
     'pinyin': ['zh-Hans-Pinyin'],
     'arabic': ['ar'],
     'greek': ['el']
+*/
   },
 
   enableSetting: function km_enableSetting(theKey) {
@@ -94,8 +97,8 @@ const IMEManager = {
       this.keyboards = [].concat(this.keyboardSettingGroups['english']);
     }
 
-    if (this.keyboards.indexOf(IMEController.currentKeyboard) === -1)
-        IMEController.currentKeyboard = this.keyboards[0];
+    if (this.keyboards.indexOf(IMEController.currentGroup) === -1)
+        IMEController.currentGroup = this.keyboards[0];
 
 /*    this.keyboards.forEach((function loadIMEngines(name) {
       IMEController.loadKeyboard(name);

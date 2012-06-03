@@ -3,8 +3,10 @@
 const Keyboards = {
   fallbacks: {
 
-    label: 'English',
-    menuLabel: 'English',
+    meta: {
+      label: 'System',
+      menuLabel: 'System'
+    },
 
     // text layout
     textType: {
@@ -18,7 +20,7 @@ const Keyboards = {
         u: 'ùúûüū',
         s: 'śšşß',
         S: 'ŚŠŞ',
-        n: 'ńñň'
+        n: 'ńñň',
         ';)': [':)', 'x)', ':(', 'x('],
         '?123': ['?', '!'],
         '.': [',', ':', ';', '...']
@@ -27,7 +29,7 @@ const Keyboards = {
         [{ value: 'q' }, { value: 'w' }, { value: 'e' } , { value: 'r' }, { value: 't' } , { value: 'y' }, { value: 'u' } , { value: 'i' }, { value: 'o' }, { value: 'p' }],
         [{ value: 'a' }, { value: 's' }, { value: 'd' }, { value: 'f' }, { value: 'g' } , { value: 'h' }, { value: 'j' }, { value: 'k' }, { value: 'l' }, { value: "'", keyCode: 39 }],
         [{ value: '⇪', ratio: 1.5, keyCode: KeyEvent.DOM_VK_CAPS_LOCK }, { value: 'z' }, { value: 'x' }, { value: 'c' }, { value: 'v' }, { value: 'b' }, { value: 'n' }, { value: 'm' }, { value: '⇍', ratio: 1.5, keyCode: KeyEvent.DOM_VK_BACK_SPACE, repeat:true }],
-        [{ value: '?123', keyCode: {changeto: 'numsym'}, ratio: 2}, { value: ';)', ratio: 1}, { value: ' ', ratio: 4, keyCode: KeyboardEvent.DOM_VK_SPACE, doubletap: [KeyEvent.DOM_VK_BACK_SPACE, '.'], repeat:true }, {value: '.', ratio: 1}, { value: '↵', ratio: 2, keyCode: KeyEvent.DOM_VK_RETURN }]
+        [{ value: '?123', keyCode: {changeto: 'alternative'}, ratio: 2}, { value: ';)', ratio: 1}, { value: ' ', ratio: 4, keyCode: KeyboardEvent.DOM_VK_SPACE, doubletap: [KeyEvent.DOM_VK_BACK_SPACE, '.'], repeat:true }, {value: '.', ratio: 1}, { value: '↵', ratio: 2, keyCode: KeyEvent.DOM_VK_RETURN }]
       ]
     },
 
@@ -47,7 +49,7 @@ const Keyboards = {
         [{ value: '[' }, { value: ']' }, { value: '{' }, { value: '}' }, { value: '#' }, { value: '%' }, { value: '^' }, { value: '+' }, { value: '=' }, { value: '°' }],
         [{ value: '_' }, { value: '¡' }, { value: '|' }, { value: '~' }, { value: '<' }, { value: '>' }, { value: '€' }, { value: '£' }, { value: '¥' }, { value: '·' }],
         [{ value: '123', ratio: 1.5, keyCode: {changeto: 'alternative'} }, { value: '¿' }, { value: '?' }, { value: "¡" }, { value: '!' }, { value: '"' }, { value: "'" }, { value: '*' }, { value: '⇍', ratio: 1.5, keyCode: KeyEvent.DOM_VK_BACK_SPACE, repeat:true }],
-        'numsym'
+        'alternative'
       ]
     },
 
@@ -63,7 +65,7 @@ const Keyboards = {
         'textType',
         [{ value: '?123', keyCode: {changeto: 'alternative'}, ratio: 2}, { value: '/', reatio: 1}, { value: '-', reatio: 1}, { value: '_', reatio: 1}, { value: ':', reatio: 1}, { value: '.', reatio: 1}, { value: '.com', reatio: 1}, { value: '↵', ratio: 2, keyCode: KeyEvent.DOM_VK_RETURN }]
       ]
-    }
+    },
 
     // email layout
     emailType: {
@@ -72,9 +74,9 @@ const Keyboards = {
         '.com' : ['.org', '.gov', '.es', '.co.uk', '.fr'],
       },
       keys: [
-        'textType',
-        'textType',
-        'textType',
+        'urlType',
+        'urlType',
+        'urlType',
         [{ value: '?123', keyCode: {changeto: 'alternative'}, ratio: 2}, { value: '+', reatio: 1}, { value: '-', reatio: 1}, { value: '_', reatio: 1}, { value: ',', reatio: 1}, { value: '.', reatio: 1}, { value: '.com', reatio: 1}, { value: '↵', ratio: 2, keyCode: KeyEvent.DOM_VK_RETURN }]
       ]
     },
@@ -109,27 +111,38 @@ const Keyboards = {
 
   },
 
+  en: {
+    meta: {
+      label: 'English',
+      menuLabel: 'English'
+    }
+  },
+
   es: {
-    redifining: 'textType',
-    type: 'keyboard',
-    label: 'Spanish',
-    menuLabel: 'English',
-    alt: {
-      a: 'áàâãäåāæ',
-      c: 'çćč',
-      e: 'é€èêëē',
-      i: 'íìîïī',
-      o: 'óòôõöōœø',
-      u: 'úùûüū',
-      s: 'śšşß',
-      S: 'ŚŠŞ',
-      n: 'ńñň'
+    meta: {
+      label: 'Español',
+      menuLabel: 'Español',
     },
-    keys: [
-      '.fallbacks.textType',
-      [{ value: 'a' }, { value: 's' }, { value: 'd' }, { value: 'f' }, { value: 'g' } , { value: 'h' }, { value: 'j' }, { value: 'k' }, { value: 'l' }, { value: "ñ"}],
-      '.fallbacks.textType',
-      '.fallbacks.textType',
-    ]
+
+    textType: {
+      type: 'keyboard',
+      alt: {
+        a: 'áàâãäåāæ',
+        c: 'çćč',
+        e: 'é€èêëē',
+        i: 'íìîïī',
+        o: 'óòôõöōœø',
+        u: 'úùûüū',
+        s: 'śšşß',
+        S: 'ŚŠŞ',
+        n: 'ńñň'
+      },
+      keys: [
+        '.fallbacks.textType',
+        [{ value: 'a' }, { value: 's' }, { value: 'd' }, { value: 'f' }, { value: 'g' } , { value: 'h' }, { value: 'j' }, { value: 'k' }, { value: 'l' }, { value: "ñ"}],
+        '.fallbacks.textType',
+        '.fallbacks.textType',
+      ]
+    }
   }
 };
