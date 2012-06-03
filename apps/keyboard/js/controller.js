@@ -10,6 +10,7 @@ const IMEController = (function() {
   var _inAlternativeMode = false;
   var _formerLayout, _currentLayout;
   var _surface;
+  var _hideMenuTimer, _hideMenuTimeout = 700;
 
   function _mapType(type) {
     switch (type) {
@@ -192,6 +193,25 @@ const IMEController = (function() {
     IMERender.showAlternativesCharMenu(evt.target, key, key.alternatives);
   }
 
+  // hide alternatives
+  function _onEnterArea(evt) {
+    IMERender.highlightKey(evt.target);
+    if (evt.target.parentNode !== IMERender.menu)
+      IMERender.hideAlternativesCharMenu();
+    else
+      window.clearTimeout(_hideMenuTimer);
+  }
+
+  // timeout to hide alternatives
+  function _onReleaseSurface() {
+    _hideMenuTimer = window.setTimeout(
+      function() {
+        IMERender.hideAlternativesCharMenu();
+      },
+      _hideMenuTimeout
+    );
+  }
+
   // if repeat is enabled for the key, send codes
   function _onKeepPressing(evt) {
     var key = _getKey(evt.target);
@@ -214,10 +234,8 @@ const IMEController = (function() {
 
   var _imeEvents = {
 
-    // hightlight on enter area
-    enterarea: function (evt) {
-      IMERender.highlightKey(evt.target);
-    },
+    // hide alternatives and hightlight on enter area
+    enterarea: _onEnterArea,
 
     // unhighlight on leaving area
     leavearea: function (evt) {
@@ -237,7 +255,10 @@ const IMEController = (function() {
     pressarea: _onPressArea,
 
     // show alternatives
-    longpress: _onLongPress
+    longpress: _onLongPress,
+
+    // hide alternatives menu
+    releasesurface: _onReleaseSurface
   }
 
   function _init() {
@@ -289,11 +310,8 @@ const IMEController = (function() {
       var altOptions, alternativeKeys = [];
 
       // set value for alternative key
-      if (typeof key.keyCode === 'object' && key.keyCode.switchAlternative) {
+      if (typeof key.keyCode === 'object' && key.keyCode.switchAlternative)
         key.value = (_inAlternativeMode ? key.keyCode.altValue : key.value) || key.value;
-        console.log(_inAlternativeMode);
-        console.log(key.value);
-      }
 
       // set id
       key.id = {
@@ -402,6 +420,7 @@ const IMEController = (function() {
     },
 
     showIME: function(type) {
+      _inAlternativeMode = false;
       _currentInputType = type;
       _updateLayout();
     },
