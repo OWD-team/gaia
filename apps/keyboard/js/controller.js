@@ -7,7 +7,8 @@
 
 const IMEController = (function() {
   var _currentGroup, _currentInputType, _currentKey;
-  var _currentLayout;
+  var _inAlternativeMode = false;
+  var _formerLayout, _currentLayout;
   var _surface;
 
   function _mapType(type) {
@@ -103,7 +104,7 @@ const IMEController = (function() {
             Array.prototype.push.apply(keyCodes, _flatCodes(item));
           });
 
-        // special object: changeto
+        // special object: changeTo, switchAlternative, toInputType
         } else {
             keyCodes.push(str);
         }
@@ -135,12 +136,26 @@ const IMEController = (function() {
 
       // special action
       if (typeof keyCode === 'object') {
-        // changeto action changes the layout
-        if (keyCode.changeto !== undefined) {
-          _updateLayout(keyCode.changeto);
 
-        } else if (keyCode.toinputtype){
+        // changeTo action changes the layout
+        if (keyCode.changeTo !== undefined) {
+          _updateLayout(keyCode.changeTo);
+
+        // toInputType returns the layout to which represents the current input type
+        } else if (keyCode.toInputType) {
           _updateLayout();
+
+        // switchAlternative lets change the layout, if the key is pressed again, return to the former one
+        } else if (keyCode.switchAlternative !== undefined) {
+          if (!_inAlternativeMode) {
+            _inAlternativeMode = true;
+            _formerLayout = _currentLayout;
+            _updateLayout(keyCode.switchAlternative);
+
+          } else {
+            _inAlternativeMode = false;
+            _updateLayout(_formerLayout);
+          }
 
         } else {
           throw {name:'UnexpectedAction', message:'Action not recognized for this key'};
@@ -173,8 +188,10 @@ const IMEController = (function() {
   function _onKeepPressing(evt) {
     var area = evt.target;
     var key = _getKey(area);
-    if (key.repeat)
+    if (key.repeat) {
+      IMEFeedback.triggerFeedback();
       _sendCodes(key);
+    }
   }
 
   // send codes of the double tap
@@ -183,7 +200,12 @@ const IMEController = (function() {
     var key = _getKey(area);
     _sendCodes(key, 'doubletap');
   }
-  
+
+  // trigger feedback
+  function _onPressArea(evt) {
+    IMEFeedback.triggerFeedback();
+  }
+
   var _imeEvents = {
 
     // hightlight on enter area
@@ -203,7 +225,10 @@ const IMEController = (function() {
     doubletap: _onDoubleTap,
 
     // manage repetition
-    keeppressing: _onKeepPressing
+    keeppressing: _onKeepPressing,
+
+    // triggers feedback
+    pressarea: _onPressArea
   }
 
   function _init() {
@@ -253,6 +278,13 @@ const IMEController = (function() {
         throw {name:'MissedValue', message:'value entry is mandatory for keys.'};
 
       var altOptions, alternativeKeys = [];
+
+      // set value for alt key
+      if (typeof key.keyCode === 'object' && key.keyCode.switchAlternative) {
+        key.value = (_inAlternativeMode ? key.keyCode.altValue : key.value) || key.value;
+        console.log(_inAlternativeMode);
+        console.log(key.value);
+      }
 
       // get keycodes
       key.keyCodes = _flatCodes(key.keyCodes || key.keyCode || key.value);
@@ -305,9 +337,8 @@ const IMEController = (function() {
       if (row === 'inputType')
         return _getLayout(_currentInputType+'Type').keys[r];
 
-      if (typeof row === 'string'){
+      if (typeof row === 'string')
         return resolveRow(_getLayout(row).keys[r], r);
-        }
 
       throw {
         name:'UnexpectedRowSpecification',
@@ -329,7 +360,9 @@ const IMEController = (function() {
 
   function _updateLayout(which) {
     which = which || _currentInputType+'Type';
-    _currentLayout = clone(_getLayout(which), true);
+    var layout = typeof which === 'string' ? _getLayout(which) : which;
+    _currentLayout = clone(layout, true);
+
     _expandLayout(_currentLayout);
     IMERender.draw(_currentLayout);
     _updateTargetWindowHeight();
