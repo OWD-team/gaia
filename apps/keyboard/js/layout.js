@@ -11,25 +11,11 @@ const Keyboards = {
     // text layout
     textType: {
       type: 'keyboard',
-      alt: {
-        a: 'àáâãäåāæ',
-        c: 'çćč',
-        e: 'èéêëē€',
-        i: 'ìíîïī',
-        o: 'òóôõöōœø',
-        u: 'ùúûüū',
-        s: 'śšşß',
-        S: 'ŚŠŞ',
-        n: 'ńñň',
-        ';)': [':)', 'x)', ':(', 'x('],
-        '?123': ['?', '!'],
-        '.': [',', ':', ';', '...']
-      },
       keys: [
-        [{ value: 'q' }, { value: 'w' }, { value: 'e' } , { value: 'r' }, { value: 't' } , { value: 'y' }, { value: 'u' } , { value: 'i' }, { value: 'o' }, { value: 'p' }],
-        [{ value: 'a' }, { value: 's' }, { value: 'd' }, { value: 'f' }, { value: 'g' } , { value: 'h' }, { value: 'j' }, { value: 'k' }, { value: 'l' }, { value: "'", keyCode: 39 }],
-        [{ value: '⇪', ratio: 1.5, keyCode: KeyEvent.DOM_VK_CAPS_LOCK }, { value: 'z' }, { value: 'x' }, { value: 'c' }, { value: 'v' }, { value: 'b' }, { value: 'n' }, { value: 'm' }, { value: '⇍', ratio: 1.5, keyCode: KeyEvent.DOM_VK_BACK_SPACE, repeat:true }],
-        [{ value: '?123', keyCode: {switchAlternative: 'alternative', altValue: 'ABC'}, ratio: 2}, { value: ';)', ratio: 1}, { value: ' ', ratio: 4, keyCode: KeyboardEvent.DOM_VK_SPACE, doubletap: [KeyEvent.DOM_VK_BACK_SPACE, '.'], repeat:true }, {value: '.', ratio: 1}, { value: '↵', ratio: 2, keyCode: KeyEvent.DOM_VK_RETURN }]
+        [{ value: 'q' }, { value: 'w' }, { value: 'e', alternatives:'èéêëē€' } , { value: 'r' }, { value: 't' } , { value: 'y' }, { value: 'u', alternatives:'ùúûüū' } , { value: 'i', alternatives:'ìíîïī' }, { value: 'o', alternatives:'òóôõöōœø' }, { value: 'p' }],
+        [{ value: 'a', alternatives:'àáâãäåāæ' }, { value: 's', alternatives:'śšşß', uppercase: {alternatives:'ŚŠŞ'} }, { value: 'd' }, { value: 'f' }, { value: 'g' } , { value: 'h' }, { value: 'j' }, { value: 'k' }, { value: 'l' }, { value: "'", keyCode: 39 }],
+        [{ value: '⇪', ratio: 1.5, keyCode: KeyEvent.DOM_VK_CAPS_LOCK }, { value: 'z' }, { value: 'x' }, { value: 'c', alternatives:'çćč' }, { value: 'v' }, { value: 'b' }, { value: 'n', alternatives:'ńñň' }, { value: 'm' }, { value: '⇍', ratio: 1.5, keyCode: KeyEvent.DOM_VK_BACK_SPACE, repeat:true }],
+        [{ value: '?123', keyCode: {switchAlternative: 'alternative', altValue: 'ABC'}, ratio: 2}, { value: ';)', alternatives: [':)', 'x)', ':(', 'x('], ratio: 1}, { value: ' ', ratio: 4, keyCode: KeyboardEvent.DOM_VK_SPACE, doubletap: [KeyEvent.DOM_VK_BACK_SPACE, '.'], repeat:true }, {value: '.', alternatives: [',', ':', ';', '...'], ratio: 1}, { value: '↵', ratio: 2, keyCode: KeyEvent.DOM_VK_RETURN }]
       ]
     },
 
@@ -56,28 +42,22 @@ const Keyboards = {
     // url layout
     urlType: {
       type: 'keyboard',
-      alt: {
-        '.com' : ['.org', '.gov', '.es', '.co.uk', '.fr'],
-      },
       keys: [
         'textType',
         [{ value: 'a' }, { value: 's' }, { value: 'd' }, { value: 'f' }, { value: 'g' } , { value: 'h' }, { value: 'j' }, { value: 'k' }, { value: 'l' }, { value: "@"}],
         'textType',
-        [{ value: '?123', keyCode: {switchAlternative: 'alternative', altValue: 'ABC'}, ratio: 2}, { value: '/', reatio: 1}, { value: '-', reatio: 1}, { value: '_', reatio: 1}, { value: ':', reatio: 1}, { value: '.', reatio: 1}, { value: '.com', reatio: 1}, { value: '↵', ratio: 2, keyCode: KeyEvent.DOM_VK_RETURN }]
+        [{ value: '?123', keyCode: {switchAlternative: 'alternative', altValue: 'ABC'}, ratio: 2}, { value: '/', reatio: 1}, { value: '-', reatio: 1}, { value: '_', reatio: 1}, { value: '.', reatio: 1}, { value: '.com', ratio: 2, alternatives:['.org', '.gov', '.es', '.co.uk', '.fr']}, { value: '↵', ratio: 2, keyCode: KeyEvent.DOM_VK_RETURN }]
       ]
     },
 
     // email layout
     emailType: {
       type: 'keyboard',
-      alt: {
-        '.com' : ['.org', '.gov', '.es', '.co.uk', '.fr'],
-      },
       keys: [
         'urlType',
         'urlType',
         'urlType',
-        [{ value: '?123', keyCode: {switchAlternative: 'alternative', altValue: 'ABC'}, ratio: 2}, { value: '+', reatio: 1}, { value: '-', reatio: 1}, { value: '_', reatio: 1}, { value: ',', reatio: 1}, { value: '.', reatio: 1}, { value: '.com', reatio: 1}, { value: '↵', ratio: 2, keyCode: KeyEvent.DOM_VK_RETURN }]
+        ['urlType', { value: '+', reatio: 1}, 'urlType', 'urlType', 'urlType', 'urlType', 'urlType']
       ]
     },
 
@@ -85,14 +65,11 @@ const Keyboards = {
     numberType: {
       type: 'keyboard',
       width: 9,
-      alt: {
-        '.' : '\''
-      },
       keys: [
         [{ value: '1', ratio: 3},{ value: '2', ratio: 3},{ value: '3', ratio: 3}],
         [{ value: '4', ratio: 3},{ value: '5', ratio: 3},{ value: '6', ratio: 3}],
         [{ value: '7', ratio: 3},{ value: '8', ratio: 3},{ value: '9', ratio: 3}],
-        [{ value: '.', ratio: 3},{ value: '0', ratio: 3},{ value: '⇍', ratio: 3, keyCode: KeyEvent.DOM_VK_BACK_SPACE, repeat:true }]
+        [{ value: '.', alternatives: '\'', ratio: 3},{ value: '0', ratio: 3},{ value: '⇍', ratio: 3, keyCode: KeyEvent.DOM_VK_BACK_SPACE, repeat:true }]
       ]
     },
 

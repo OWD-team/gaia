@@ -307,7 +307,7 @@ const IMEController = (function() {
       if (key.value === undefined)
         throw {name:'MissedValue', message:'value entry is mandatory for keys.'};
 
-      var altOptions, alternativeKeys = [];
+      var altOptions, altKey, alternativeKeys = [];
 
       // set value for alternative key
       if (typeof key.keyCode === 'object' && key.keyCode.switchAlternative)
@@ -324,16 +324,22 @@ const IMEController = (function() {
       key.doubletap = _flatCodes(key.doubletap || '');
       key.repeat = !!key.repeat;
 
-      // alternatives
-      if (!key.alternatives) {
-        altOptions = layout.alt && layout.alt[key.value] ? layout.alt[key.value] : [];
-        if (typeof altOptions === 'string')
-          altOptions = altOptions.split('');
+      // alternatives are optional
+      if (key.alternatives === undefined)
+        key.alternatives = [];
 
+      // if provided as string, split one per character
+      else if (typeof key.alternatives === 'string')
+        key.alternatives = key.alternatives.split('');
+
+      // array is the normalized form
+      if (Array.isArray(key.alternatives)) {
+        altOptions = key.alternatives;
         for (var a = 0, alt; alt = altOptions[a]; a += 1) {
-          alternativeKeys.push({
-            keyCodes: _flatCodes(alt),
-            value: alt,
+
+          // base key
+          altKey = {
+            value: key.value,
             doubletap: '',
             repeat: false,
             id: {
@@ -341,9 +347,29 @@ const IMEController = (function() {
               column: column,
               alternative: a
             }
-          });
+          };
+
+          // alternative can be string or array
+          if (Array.isArray(alt) || typeof alt === 'string') {
+            altKey.keyCodes = _flatCodes(alt);
+            if (typeof alt === 'string')
+              altKey.value = alt;
+
+          // alternative can be the key object itself
+          } else {
+            extend(altKey, alt, {
+              alternatives:[] // prevent for alternatives to have alternatives
+            });
+          }
+          key.alternatives[a] = altKey;
         }
-        key.alternatives = alternativeKeys;
+
+      // error
+      } else {
+        throw {
+          name: 'UnexpectedAlternativesSpecification',
+          message: 'If provided, alternative should be a string ("...") or an array of alternatives ([...]).'
+        };
       }
 
       return key;
