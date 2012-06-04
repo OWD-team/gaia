@@ -103,7 +103,8 @@ eal.Surface = function(surfaceElement, spec) {
   var _longPressTimer, _doubleTapTimer, _keepPressingInterval;
   var _isWaitingForSecondTap = false;
   var _hasMoved;
-  var _enterArea, _currentArea, _formerArea;
+  var _accessArea, _currentArea, _formerArea;
+  var _enterarea; // enterarea and leavearea behave as parenthesis. The second can not exist without the previous one.
   var _options;
 
   function _newEvent(base, type, area, from) {
@@ -113,7 +114,7 @@ eal.Surface = function(surfaceElement, spec) {
       detail: {
         area: area || base.detail.area || base.target || null,
         moved: _hasMoved || base.detail.moved || false,
-        enterArea: _enterArea,
+        accessArea: _accessArea,
         fromArea: from || null
       }
     });
@@ -127,7 +128,7 @@ eal.Surface = function(surfaceElement, spec) {
 
   // some events generate other events
   function _addSynteticEvents(evts) {
-    var newEvt, evt, type;
+    var newEvt, evt, type, readyToTap = false;
     for (var i = 0; evt = evts[i]; i += 1) {
       newEvt = null;
       switch (evt.type) {
@@ -140,11 +141,12 @@ eal.Surface = function(surfaceElement, spec) {
           // interrumpt long press and keep pressing
           window.clearTimeout(_longPressTimer);
           window.clearInterval(_keepPressingInterval);
+          readyToTap = true;
         break;
 
         case 'releasesurface':
           // release, if in area, generates a tap
-          if (_currentArea) {
+          if (_currentArea && readyToTap) {
 
             // waiting for second tap -> generate the double tap
             if (_isWaitingForSecondTap && _currentArea === _formerArea) {
@@ -221,10 +223,11 @@ eal.Surface = function(surfaceElement, spec) {
     var newArea = _options.isArea(evt.target);
     if (newArea) {
       _formerArea = _currentArea;
-      _enterArea = _currentArea = newArea;
+      _accessArea = _currentArea = newArea;
       abstractEvts.push(
         _newEvent(evt, 'enterarea', _currentArea)
       );
+      _enterarea = _currentArea;
     }
 
     _handleAbstractEvents(abstractEvts, evt);
@@ -234,10 +237,11 @@ eal.Surface = function(surfaceElement, spec) {
     _debugBasicEvents && console.log('--> mouseleave');
 
     var abstractEvts = [];
-    if (_currentArea) {
+    if (_currentArea && _enterarea) {
       abstractEvts.push(
         _newEvent(evt, 'leavearea', _currentArea)
       );
+      _enterarea = null;
     }
 
     abstractEvts.push(
@@ -258,11 +262,15 @@ eal.Surface = function(surfaceElement, spec) {
       return;
 
     _hasMoved = true;
-    var abstractEvts = [
-      _newEvent(evt, 'leavearea', _currentArea),
-      _newEvent(evt, 'changearea', newArea, _currentArea),
-      _newEvent(evt, 'enterarea', newArea)
-    ];
+    var abstractEvts = [];
+    if (_enterarea) {
+      abstractEvts.push(_newEvent(evt, 'leavearea', _currentArea));
+      _enterarea = null;
+    }
+    if (_currentArea) {
+      abstractEvts.push(_newEvent(evt, 'changearea', newArea, _currentArea));
+    }
+    abstractEvts.push(_newEvent(evt, 'enterarea', newArea));
 
     _formerArea = _currentArea;
     _currentArea = newArea;
@@ -282,7 +290,7 @@ eal.Surface = function(surfaceElement, spec) {
   }
 
   _hasMoved = false;
-  _currentArea = _enterArea = _formerArea = null;
+  _currentArea = _accessArea = _formerArea = null;
 }
 
 })();
