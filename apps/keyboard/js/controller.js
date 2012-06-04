@@ -60,6 +60,7 @@ const IMEController = (function() {
     this.message = 'KeyCodes can only be arrays ([...]), strings ("...") or supported actions';
   }
 
+  // return an array of numeric key codes
   function _flatCodes(str) {
     var keyCodes = [];
     switch (typeof str) {
@@ -90,6 +91,7 @@ const IMEController = (function() {
       break;
 
       // other types not supported
+      
       default:
         throw new UnexpectedKeyCode();
       break;
@@ -342,7 +344,7 @@ const IMEController = (function() {
         if (!key.upperCase.keyCodes) {
           upperCodes = [];
           key.keyCodes.forEach(function(code) {
-            upperCodes.push(_flatCodes(String.fromCharCode(code).toLocaleUpperCase()));
+            Array.prototype.push.apply(upperCodes, _flatCodes(String.fromCharCode(code).toLocaleUpperCase()));
           });
           key.keyCodes = upperCodes;
         }
@@ -352,7 +354,7 @@ const IMEController = (function() {
       if (key.alternatives === undefined)
         key.alternatives = [];
 
-      // if provided as string, split one per character
+      // if provided as string, split one by character
       else if (typeof key.alternatives === 'string')
         key.alternatives = key.alternatives.split('');
 
@@ -366,7 +368,7 @@ const IMEController = (function() {
             value: key.value,
           };
 
-          // alternative can be string or array
+          // each alternative can be a string or an array
           if (Array.isArray(alt) || typeof alt === 'string') {
             altKey.keyCodes = _flatCodes(alt);
             if (typeof alt === 'string')
@@ -441,10 +443,10 @@ const IMEController = (function() {
 
   function _updateLayout(which) {
     which = which || _currentLayout;
-    var layout = clone(typeof which === 'string' ? _getLayout(which) : which, true);
+    var layout = typeof which === 'string' ? _getLayout(which) : which;
+    layout = clone(layout, true);
 
     _expandLayout(layout);
-    console.log(layout.keys[0][0].value);
 
     // save the upperCase variation but keep the current layout unalterated
     if (_inUpperCase)
