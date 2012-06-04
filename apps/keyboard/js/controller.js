@@ -7,34 +7,10 @@
 
 const IMEController = (function() {
   var _currentGroup, _currentInputType, _currentKey;
-  var _inAlternativeMode = false;
-  var _formerLayout, _currentLayout;
+  var _inUpperCase, _isUpperCaseLocked, _inAlternativeMode = false;
+  var _formerLayout, _currentLayout, _upperCaseVariation;
   var _surface;
   var _hideMenuTimer, _hideMenuTimeout = 700;
-
-  function _mapType(type) {
-    switch (type) {
-      // basic types
-      case 'url':
-      case 'tel':
-      case 'email':
-      case 'text':
-        return type;
-      break;
-
-      // default fallback and textual types
-      case 'password':
-      case 'search':
-      default:
-        return 'text';
-      break;
-
-      case 'number':
-      case 'range': // XXX: should be different from number
-        return 'number';
-      break;
-    }
-  }
 
   function _updateTargetWindowHeight() {
     var resizeAction = {action: 'resize', height: IMERender.ime.scrollHeight + 'px'};
@@ -72,10 +48,11 @@ const IMEController = (function() {
     var r = keyHTMLElement.dataset.row;
     var c = keyHTMLElement.dataset.column;
     var a = keyHTMLElement.dataset.alternative;
+    var root = _inUpperCase ? _upperCaseVariation : _currentLayout;
     if (a !== undefined)
-      return _currentLayout.keys[r][c].alternatives[a];
+      return root.keys[r][c].alternatives[a];
     else
-      return _currentLayout.keys[r][c];
+      return root.keys[r][c];
   }
 
   function UnexpectedKeyCode() {
@@ -130,7 +107,6 @@ const IMEController = (function() {
     else
       codes = key.keyCodes;
 
-
     // send codes
     for (var i = 0, l = codes.length, keyCode; i < l; i += 1) {
       keyCode = codes[i];
@@ -144,7 +120,7 @@ const IMEController = (function() {
 
         // toInputType returns the layout to which represents the current input type
         } else if (keyCode.toInputType) {
-          _updateLayout();
+          _updateLayout(_currentInputType+'Type');
 
         // switchAlternative lets change the layout, if the key is pressed again, return to the former one
         } else if (keyCode.switchAlternative !== undefined) {
@@ -165,14 +141,25 @@ const IMEController = (function() {
       // default keyCode
       } else {
         switch (keyCode) {
+          case KeyEvent.DOM_VK_CAPS_LOCK:
+            if (mode === 'doubletap') {
+              _isUpperCaseLocked = true;
+              _inUpperCase = true;
+            } else {
+              _isUpperCaseLocked = false;
+              _inUpperCase = !_inUpperCase;
+              _updateLayout();
+            }
+          break;
+
           case KeyEvent.DOM_VK_BACK_SPACE:
           case KeyEvent.DOM_VK_RETURN:
             window.navigator.mozKeyboard.sendKey(keyCode, 0);
-            break;
+          break;
 
           default:
             window.navigator.mozKeyboard.sendKey(0, keyCode);
-            break;
+          break;
         }
       }
     }
@@ -182,6 +169,12 @@ const IMEController = (function() {
   function _onTap(evt) {
     var key = _getKey(evt.target);
     _sendCodes(key);
+
+    // disable upperCase when clicking another key
+    if (key.keyCodes[0] !== KeyEvent.DOM_VK_CAPS_LOCK && !_isUpperCaseLocked && _inUpperCase) {
+      _inUpperCase = false;
+      _updateLayout();
+    }
   }
 
   // show alternatives
@@ -303,26 +296,57 @@ const IMEController = (function() {
   function _expandLayout(layout) {
 
     // expand key
-    function expandKey(key, row, column) {
+    function expandKey(key, row, column, altIndex) {
       if (key.value === undefined)
         throw {name:'MissedValue', message:'value entry is mandatory for keys.'};
 
-      var altOptions, altKey, alternativeKeys = [];
+      var altOptions, altKey, upperCodes, alternativeKeys = [];
 
       // set value for alternative key
       if (typeof key.keyCode === 'object' && key.keyCode.switchAlternative)
         key.value = (_inAlternativeMode ? key.keyCode.altValue : key.value) || key.value;
+
+      // UpperCase: part 1
+      // provide a default upperCase, normalize and update the info of the key
+      key.upperCase = key.upperCase || {};
+      if (_inUpperCase) {
+        if (typeof key.upperCase === 'string') {
+          key.upperCase = {
+            value: key.upperCase,
+            keyCodes: key.upperCase
+          };
+        }
+        extend(key, key.upperCase);
+      }
 
       // set id
       key.id = {
         row: row,
         column: column
       };
+      if (altIndex)
+        key.id.alternative = altIndex;
 
       // get keycodes
       key.keyCodes = _flatCodes(key.keyCodes || key.keyCode || key.value);
       key.doubletap = _flatCodes(key.doubletap || '');
       key.repeat = !!key.repeat;
+
+      // UpperCase: part 2
+      // try local upperCase when needed
+      if (_inUpperCase) {
+
+        if (!key.upperCase.value)
+          key.value = key.value.toLocaleUpperCase();
+
+        if (!key.upperCase.keyCodes) {
+          upperCodes = [];
+          key.keyCodes.forEach(function(code) {
+            upperCodes.push(_flatCodes(String.fromCharCode(code).toLocaleUpperCase()));
+          });
+          key.keyCodes = upperCodes;
+        }
+      }
 
       // alternatives are optional
       if (key.alternatives === undefined)
@@ -340,13 +364,6 @@ const IMEController = (function() {
           // base key
           altKey = {
             value: key.value,
-            doubletap: '',
-            repeat: false,
-            id: {
-              row: row,
-              column: column,
-              alternative: a
-            }
           };
 
           // alternative can be string or array
@@ -361,7 +378,7 @@ const IMEController = (function() {
               alternatives:[] // prevent for alternatives to have alternatives
             });
           }
-          key.alternatives[a] = altKey;
+          key.alternatives[a] = expandKey(altKey, r, c, a);
         }
 
       // error
@@ -394,7 +411,7 @@ const IMEController = (function() {
 
     // resolve row dynamics
     function resolveRow(row, r) {
-      
+
       if (Array.isArray(row))
         return row;
 
@@ -423,12 +440,19 @@ const IMEController = (function() {
   }
 
   function _updateLayout(which) {
-    which = which || _currentInputType+'Type';
-    var layout = typeof which === 'string' ? _getLayout(which) : which;
-    _currentLayout = clone(layout, true);
+    which = which || _currentLayout;
+    var layout = clone(typeof which === 'string' ? _getLayout(which) : which, true);
 
-    _expandLayout(_currentLayout);
-    IMERender.draw(_currentLayout);
+    _expandLayout(layout);
+    console.log(layout.keys[0][0].value);
+
+    // save the upperCase variation but keep the current layout unalterated
+    if (_inUpperCase)
+      _upperCaseVariation = layout;
+    else
+      _currentLayout = layout;
+
+    IMERender.draw(layout);
     _updateTargetWindowHeight();
   }
 
@@ -447,8 +471,9 @@ const IMEController = (function() {
 
     showIME: function(type) {
       _inAlternativeMode = false;
+      _inUpperCase = _isUpperCaseLocked = false;
       _currentInputType = type;
-      _updateLayout();
+      _updateLayout(_currentInputType+'Type');
     },
 
     onResize: function(nWidth, nHeight, fWidth, fHeihgt) {
@@ -458,7 +483,7 @@ const IMEController = (function() {
       // we presume that the targetWindow has been restored by
       // window manager to full size by now.
       IMERender.getTargetWindowMetrics();
-      _updateLayout();
+      _updateLayout(_currentInputType+'Type');
     }
   };
 })();

@@ -13,7 +13,7 @@ const Keyboards = {
       type: 'keyboard',
       keys: [
         [{ value: 'q' }, { value: 'w' }, { value: 'e', alternatives:'èéêëē€' } , { value: 'r' }, { value: 't' } , { value: 'y' }, { value: 'u', alternatives:'ùúûüū' } , { value: 'i', alternatives:'ìíîïī' }, { value: 'o', alternatives:'òóôõöōœø' }, { value: 'p' }],
-        [{ value: 'a', alternatives:'àáâãäåāæ' }, { value: 's', alternatives:'śšşß', uppercase: {alternatives:'ŚŠŞ'} }, { value: 'd' }, { value: 'f' }, { value: 'g' } , { value: 'h' }, { value: 'j' }, { value: 'k' }, { value: 'l' }, { value: "'", keyCode: 39 }],
+        [{ value: 'a', alternatives:'àáâãäåāæ' }, { value: 's', alternatives:'śšşß', upperCase: {alternatives:'ŚŠŞ'} }, { value: 'd' }, { value: 'f' }, { value: 'g' } , { value: 'h' }, { value: 'j' }, { value: 'k' }, { value: 'l' }, { value: "'", keyCode: 39 }],
         [{ value: '⇪', ratio: 1.5, keyCode: KeyEvent.DOM_VK_CAPS_LOCK }, { value: 'z' }, { value: 'x' }, { value: 'c', alternatives:'çćč' }, { value: 'v' }, { value: 'b' }, { value: 'n', alternatives:'ńñň' }, { value: 'm' }, { value: '⇍', ratio: 1.5, keyCode: KeyEvent.DOM_VK_BACK_SPACE, repeat:true }],
         [{ value: '?123', keyCode: {switchAlternative: 'alternative', altValue: 'ABC'}, ratio: 2}, { value: ';)', alternatives: [':)', 'x)', ':(', 'x('], ratio: 1}, { value: ' ', ratio: 4, keyCode: KeyboardEvent.DOM_VK_SPACE, doubletap: [KeyEvent.DOM_VK_BACK_SPACE, '.'], repeat:true }, {value: '.', alternatives: [',', ':', ';', '...'], ratio: 1}, { value: '↵', ratio: 2, keyCode: KeyEvent.DOM_VK_RETURN }]
       ]

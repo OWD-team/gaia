@@ -81,10 +81,7 @@ const IMERender = (function() {
     var content = '';
     altCharsCurrent.forEach(function(key) {
       content += buildKey(key, cssWidth);
-      console.log(content);
-      console.log('----------------');
     });
-    console.log(content);
 
     this.menu.innerHTML = content;
     this.menu.style.display = 'block';
