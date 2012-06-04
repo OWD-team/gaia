@@ -265,12 +265,13 @@ eal.Surface = function(surfaceElement, spec) {
     var abstractEvts = [];
     if (_enterarea) {
       abstractEvts.push(_newEvent(evt, 'leavearea', _currentArea));
-      _enterarea = null;
+      _enterarea = null; // next assign override this
     }
     if (_currentArea) {
       abstractEvts.push(_newEvent(evt, 'changearea', newArea, _currentArea));
     }
     abstractEvts.push(_newEvent(evt, 'enterarea', newArea));
+    _enterarea = newArea;
 
     _formerArea = _currentArea;
     _currentArea = newArea;
