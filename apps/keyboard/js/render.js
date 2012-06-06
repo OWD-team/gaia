@@ -16,8 +16,18 @@ const IMERender = (function() {
   //
   var draw = function kr_draw(layout) {
 
+    //change scale (Our target screen width is 320px)
+    //TODO get document.documentElement.style.fontSize
+    //and use it for multipling changeScale deppending on the value of pixel density
+    //used in media queries
+
+    if(window.innerWidth > 0) {
+      var changeScale = window.innerWidth / 32;
+      document.documentElement.style.fontSize = changeScale + 'px';
+    }
     var content = '';
     var layoutWidth = layout.width || 10;
+    var widthRatio = 10 / layoutWidth;
 
     layout.keys.forEach((function buildKeyboardRow(row, nrow) {
       content += '<div class="keyboard-row">';
@@ -33,8 +43,10 @@ const IMERender = (function() {
             alt = layout.alt[key.value].toUpperCase();
           }
         }
-        var ratio = key.ratio || 1;
-        var keyWidth = (ratio * 100) / layoutWidth;
+        var ratio = key.ratio || 0;
+
+        //key with + key separation in rems
+        var keyWidth = ratio;
         content += buildKey(key, keyWidth);
 
       }));
@@ -74,13 +86,13 @@ const IMERender = (function() {
     var altCharsCurrent = [];
 
     if (left === true) {
-      this.menu.style.left = target.offsetLeft + 'px';
+      this.menu.style.left = '-moz-calc(' + target.offsetLeft + 'px - 0.8rem)';
       this.menu.style.right = 'auto';
       this.menu.style.textAlign = 'center';
       altCharsCurrent.push(keyObject);
       altCharsCurrent = altCharsCurrent.concat(altChars);
     } else {
-      var width = '-moz-calc(' + window.innerWidth + 'px - ' + target.offsetLeft + 'px - ' + target.style.width + ' )';
+      var width = '-moz-calc(' + window.innerWidth + 'px - ' + target.offsetLeft + 'px - 0.8rem - ' + target.style.width + ' )';
       this.menu.style.right = width;
       this.menu.style.left = 'auto';
       this.menu.style.textAlign = 'center';
@@ -95,7 +107,7 @@ const IMERender = (function() {
 
     this.menu.innerHTML = content;
     this.menu.style.display = 'block';
-    this.menu.style.top = '-moz-calc(' + target.offsetTop + 'px + 3em)';
+    this.menu.style.top = '-moz-calc(' + target.offsetTop + 'px - 4.6rem)';
 
   };
 
