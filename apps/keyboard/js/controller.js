@@ -44,12 +44,15 @@ const IMEController = (function() {
     group.normalized = true; // mark as normalized. TODO: improve this with a magic number
   }
 
-  function _getKey(keyHTMLElement) {
-    var r = keyHTMLElement.dataset.row;
-    var c = keyHTMLElement.dataset.column;
-    var a = keyHTMLElement.dataset.alternative;
+  function _getKey(id) {
+    console.log(id);
+    var tuple = JSON.parse(id);
+    console.log(id);
+    var r = tuple[0];
+    var c = tuple[1];
+    var a = tuple[2];
     var root = _inUpperCase ? _upperCaseVariation : _currentLayout;
-    if (a !== undefined)
+    if (a >= 0)
       return root.keys[r][c].alternatives[a];
     else
       return root.keys[r][c];
@@ -169,7 +172,9 @@ const IMEController = (function() {
 
   // send codes
   function _onTap(evt) {
+    console.log('on tap');
     var key = _getKey(evt.target);
+    console.log(key.value);
     _sendCodes(key);
 
     // disable upperCase when clicking another key
@@ -190,8 +195,10 @@ const IMEController = (function() {
 
   // hide alternatives
   function _onEnterArea(evt) {
-    IMERender.highlightKey(evt.target);
-    if (evt.target.parentNode !== IMERender.menu)
+    var key = _getKey(evt.details.area);
+    console.log(key.value);
+    IMERender.highlightKey(key);
+    if (key.parentNode !== IMERender.menu)
       IMERender.hideAlternativesCharMenu();
     else
       window.clearTimeout(_hideMenuTimer);
@@ -233,8 +240,10 @@ const IMEController = (function() {
     enterarea: _onEnterArea,
 
     // unhighlight on leaving area
-    leavearea: function (evt) {
-      IMERender.unHighlightKey(evt.target);
+    leavearea: function (evt) 
+    {
+      var key = _getKey(evt.detail.area);
+      IMERender.unHighlightKey(key);
     },
 
     // send codes on tap
@@ -262,9 +271,14 @@ const IMEController = (function() {
     _surface = new eal.Surface(
       IMERender.ime,
       {
-        isArea: function (target) { 
+        isArea: function (evt) { 
+          var target = evt.target;
           if (target.tagName === 'BUTTON')
-            return target;
+            return JSON.stringify([
+              target.dataset.row,
+              target.dataset.column,
+              target.dataset.alternative
+            ]);
 
           return null;
         }

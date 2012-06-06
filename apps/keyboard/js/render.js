@@ -49,11 +49,21 @@ const IMERender = (function() {
     this.menu = document.getElementById('keyboard-accent-char-menu');
   };
 
-  var highlightKey = function kr_updateKeyHighlight(key) {
+  var highlightKey = function kr_updateKeyHighlight(keyObj) {
+    var key;
+    if (keyObj.id.alternative >= 0)
+      key = this.menu.children[keyObj.id.alternative];
+    else
+      key = this.ime.children[keyObj.id.row].children[keyObj.id.column];
     key.classList.add('highlighted');
   }
 
-  var unHighlightKey = function kr_unHighlightKey(key) {
+  var unHighlightKey = function kr_unHighlightKey(keyObj) {
+    var key;
+    if (keyObj.id.alternative >= 0)
+      key = this.menu.children[keyObj.id.alternative];
+    else
+      key = this.ime.children[keyObj.id.row].children[keyObj.id.column];
     key.classList.remove('highlighted');
   };
 

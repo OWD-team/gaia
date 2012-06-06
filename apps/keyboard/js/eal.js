@@ -77,11 +77,11 @@ function logEvent(evt) {
     break;
 
     case 'changearea':
-      console.log(evt.type+': from '+evt.detail.fromArea.textContent+' to '+evt.detail.area.textContent);
+      console.log(evt.type+': from '+evt.detail.fromArea+' to '+evt.detail.area);
     break;
 
     default:
-      console.log(evt.type+': '+evt.detail.area.textContent);
+      console.log(evt.type+': '+evt.detail.area);
     break;
   }
 }
@@ -112,7 +112,8 @@ eal.Surface = function(surfaceElement, spec) {
       bubbles: true,
       cancelable: true,
       detail: {
-        area: area || base.detail.area || base.target || null,
+        target: base.detail.target || base.target,
+        area: area || base.detail.area || null,
         moved: _hasMoved || base.detail.moved || false,
         accessArea: _accessArea,
         fromArea: from || null
@@ -212,7 +213,7 @@ eal.Surface = function(surfaceElement, spec) {
     for (var i = 0, evt; evt = evts[i]; i += 1) {
       // event callback
       logEvent(evt);
-      evt.detail.area.dispatchEvent(evt);
+      evt.detail.target.dispatchEvent(evt);
     }
   }
 
@@ -220,7 +221,7 @@ eal.Surface = function(surfaceElement, spec) {
     _debugBasicEvents && console.log('--> mousedown');
 
     var abstractEvts = [_newEvent(evt, 'touchsurface')];
-    var newArea = _options.isArea(evt.target);
+    var newArea = _options.isArea(evt);
     if (newArea) {
       _formerArea = _currentArea;
       _accessArea = _currentArea = newArea;
@@ -257,7 +258,7 @@ eal.Surface = function(surfaceElement, spec) {
 
     // ignore moving when not transitioning to another area
     // (leaving to a dead zone or remain in the same area)
-    var newArea = _options.isArea(evt.target);
+    var newArea = _options.isArea(evt);
     if (!newArea || _currentArea === newArea)
       return;
 
