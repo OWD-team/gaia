@@ -101,8 +101,8 @@ const IMERender = (function() {
     }
 
     var content = '';
-    altCharsCurrent.forEach(function(key) {
-      content += buildKey(key, cssWidth);
+    altCharsCurrent.forEach(function(key, index) {
+      content += buildKey(key, cssWidth, ((left && index === 0) || (index === altCharsCurrent.length - 1)) ? 'first-char' : '');
     });
 
     this.menu.innerHTML = content;
@@ -123,14 +123,13 @@ const IMERender = (function() {
   // Private Methods
   //
 
-  var buildKey = function buildKey(key, width) {
-    width -= 1;
-    return '<button class="keyboard-key"' +
+  var buildKey = function buildKey(key, width, classes) {
+    return '<button class="keyboard-key ' + classes + '"' +
       ' data-row="' + key.id.row + '"' +
       ' data-column="' + key.id.column + '"' +
       (key.id.alternative !== undefined? ' data-alternative="' + key.id.alternative + '"' : '') +
-      ' style="width:' + width + '%"' +
-    '>' + key.value + '</button>';
+      ' style="-moz-box-flex:' + width +'"' +
+    '><span>' + key.value + '</span></button>';
   };
 
   return {
