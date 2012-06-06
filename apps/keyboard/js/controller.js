@@ -45,17 +45,20 @@ const IMEController = (function() {
   }
 
   function _getKey(id) {
-    console.log(id);
+  console.log('id: '+id);
     var tuple = JSON.parse(id);
-    console.log(id);
     var r = tuple[0];
     var c = tuple[1];
     var a = tuple[2];
     var root = _inUpperCase ? _upperCaseVariation : _currentLayout;
-    if (a >= 0)
+    console.log('OK: '+root);
+    if (a !== null) {
+    console.log(root);
       return root.keys[r][c].alternatives[a];
-    else
+    } else {
+    console.log(root);
       return root.keys[r][c];
+    }
   }
 
   function UnexpectedKeyCode() {
@@ -172,8 +175,7 @@ const IMEController = (function() {
 
   // send codes
   function _onTap(evt) {
-    console.log('on tap');
-    var key = _getKey(evt.target);
+    var key = _getKey(evt.detail.area);
     console.log(key.value);
     _sendCodes(key);
 
@@ -186,7 +188,7 @@ const IMEController = (function() {
 
   // show alternatives
   function _onLongPress(evt) {
-    var key = _getKey(evt.target);
+    var key = _getKey(evt.detail.area);
     if (!key.alternatives.length)
       return;
 
@@ -195,8 +197,7 @@ const IMEController = (function() {
 
   // hide alternatives
   function _onEnterArea(evt) {
-    var key = _getKey(evt.details.area);
-    console.log(key.value);
+    var key = _getKey(evt.detail.area);
     IMERender.highlightKey(key);
     if (key.parentNode !== IMERender.menu)
       IMERender.hideAlternativesCharMenu();
@@ -216,7 +217,7 @@ const IMEController = (function() {
 
   // if repeat is enabled for the key, send codes
   function _onKeepPressing(evt) {
-    var key = _getKey(evt.target);
+    var key = _getKey(evt.detail.area);
     if (key.repeat) {
       IMEFeedback.triggerFeedback();
       _sendCodes(key);
@@ -225,7 +226,7 @@ const IMEController = (function() {
 
   // send codes of the double tap
   function _onDoubleTap(evt) {
-    var key = _getKey(evt.target);
+    var key = _getKey(evt.detail.area);
     _sendCodes(key, 'doubletap');
   }
 
@@ -240,8 +241,7 @@ const IMEController = (function() {
     enterarea: _onEnterArea,
 
     // unhighlight on leaving area
-    leavearea: function (evt) 
-    {
+    leavearea: function (evt) {
       var key = _getKey(evt.detail.area);
       IMERender.unHighlightKey(key);
     },
@@ -263,6 +263,7 @@ const IMEController = (function() {
 
     // hide alternatives menu
     releasesurface: _onReleaseSurface
+
   }
 
   function _init() {

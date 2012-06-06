@@ -212,8 +212,8 @@ eal.Surface = function(surfaceElement, spec) {
     _addSynteticEvents(evts);   // improve performance by adding this to the loop
     for (var i = 0, evt; evt = evts[i]; i += 1) {
       // event callback
-      logEvent(evt);
       evt.detail.target.dispatchEvent(evt);
+      logEvent(evt);
     }
   }
 
