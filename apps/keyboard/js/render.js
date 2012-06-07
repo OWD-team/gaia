@@ -55,14 +55,36 @@ const IMERender = (function() {
 
     this.ime.innerHTML = content;
     this.menu = document.getElementById('keyboard-accent-char-menu');
+    this.keyHighlight = document.getElementById('keyboard-key-highlight');
   };
 
   var highlightKey = function kr_updateKeyHighlight(key) {
-    key.classList.add('highlighted');
+    var keyHighlight = this.keyHighlight;
+    var target = key;
+
+    keyHighlight.textContent = target.textContent;
+    keyHighlight.classList.add('show');
+
+    var width = keyHighlight.offsetWidth;
+    var top = target.offsetTop - 1;
+    var left = target.offsetLeft + target.offsetWidth / 2 - width / 2;
+
+    var menu = this.menu;
+    if (target.parentNode === menu) {
+      top += menu.offsetTop;
+      left += menu.offsetLeft;
+    }
+
+    left = Math.max(left, 5);
+    left = Math.min(left, window.innerWidth - width - 5);
+
+    keyHighlight.style.top = top + 'px';
+    keyHighlight.style.left = left + 'px';
   }
 
   var unHighlightKey = function kr_unHighlightKey(key) {
-    key.classList.remove('highlighted');
+    var keyHighlight = this.keyHighlight;
+    keyHighlight.classList.remove('show');
   };
 
   var showAlternativesCharMenu = function km_showAlternativesCharMenu(key, altChars) {

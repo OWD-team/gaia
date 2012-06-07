@@ -359,6 +359,8 @@ const IMEController = (function() {
     _isPressing = true;
     _currentKey = evt.target;
     var keyCode = parseInt(_currentKey.dataset.keycode);
+    if(!keyCode)
+      return;
 
 /* XXX: I dont know what is selection
     if (!keyCode && !target.dataset.selection)
