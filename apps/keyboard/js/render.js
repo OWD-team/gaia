@@ -58,7 +58,7 @@ const IMERender = (function() {
 
     // Append empty accent char menu and key highlight into content HTML
     content += '<span id="keyboard-accent-char-menu-out"><span id="keyboard-accent-char-menu"></span></span>';
-    content += '<span id="keyboard-key-highlight"><span></span></span>';
+    content += '<span id="keyboard-key-highlight"><span id="key-string" class="key-inner"></span> <span class="key-bridge"></span></span>';
 
     this.ime.innerHTML = content;
     this.menu = document.getElementById('keyboard-accent-char-menu');
@@ -69,12 +69,13 @@ const IMERender = (function() {
     var keyHighlight = this.keyHighlight;
     var target = key;
 
-    keyHighlight.querySelector("span").textContent = target.textContent;
+    keyHighlight.querySelector("#key-string").textContent = target.textContent;
     keyHighlight.classList.add('show');
 
     var width = keyHighlight.offsetWidth;
     var top = target.offsetTop - 1;
     var left = target.offsetLeft + target.offsetWidth / 2 - width / 2;
+    var keyWidth = target.offsetWidth;
 
     var menu = this.menu;
     if (target.parentNode === menu) {
@@ -87,6 +88,9 @@ const IMERender = (function() {
 
     keyHighlight.style.top = top + 'px';
     keyHighlight.style.left = left + 'px';
+    keyHighlight.querySelector("#key-string").style.width = keyWidth + 'px';
+    keyHighlight.querySelector(".key-bridge").style.width = keyWidth + 'px';
+    keyHighlight.querySelector(".key-bridge").style.marginLeft = keyWidth/2*-1 + 'px';
   }
 
   var unHighlightKey = function kr_unHighlightKey(key) {
