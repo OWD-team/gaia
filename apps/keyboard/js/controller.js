@@ -95,78 +95,56 @@ const IMEController = (function() {
     }
   }
 
-  // depending on current layout mode, return the next switch ABC/SYMBOLS button
-  function _getSwitchKey(layoutMode) {
-    var value, keyCode;
-
-    // next is SYMBOLS
-    if (layoutMode === LAYOUT_MODE_DEFAULT) {
-      value = '?123';
-      keyCode = ALTERNATE_LAYOUT;
-
-    // next is ABC
-    } else {
-      value = 'ABC';
-      keyCode = BASIC_LAYOUT;
-    }
-
-    return {
-      value: value,
-      ratio: 2,
-      keyCode: keyCode
-    };
-  };
-
   // add some special keys depending on the input's type
-  function _getTypeSensitiveKeys(inputType, ratio, overwrites) {
+  function _addTypeSensitiveKeys(inputType, row, space, where, overwrites) {
     overwrites = overwrites || {};
-    var newKeys = [];
     switch (inputType) {
       case 'url':
-        newKeys.push({ value: '.', ratio: 1, keyCode: 46 });
-        newKeys.push({ value: '/', ratio: 2, keyCode: 47 });
-        newKeys.push({ value: '.com', ratio: 2, keyCode: DOT_COM });
+        space.ratio -= 5;
+        row.splice(where, 1, // delete space
+          { value: '.', ratio: 1, keyCode: 46 },
+          { value: '/', ratio: 2, keyCode: 47 },
+          { value: '.com', ratio: 2, keyCode: DOT_COM }
+        );
       break;
 
       case 'email':
-        // ratio -= 2;
-        newKeys.push({ value: '&nbsp', ratio: ratio, keyCode: KeyboardEvent.DOM_VK_SPACE });
-        newKeys.push({ value: '@', ratio: 1, keyCode: 64 });
-        newKeys.push({ value: '.', ratio: 1, keyCode: 46 });
+        space.ratio -= 2;
+        row.splice(where, 0, { value: '@', ratio: 1, keyCode: 64 });
+        row.splice(where + 2, 0, { value: '.', ratio: 1, keyCode: 46 });
       break;
 
       case 'text':
-
-        if (overwrites['.'] !== false)
-          // ratio -= 1;
+        var next = where + 1;
+        if (overwrites['.'] !== false) {
+          space.ratio -= 1;
+          next = where + 2;
+        }
         if (overwrites[','] !== false)
-          // ratio -= 1;
+          space.ratio -= 1;
 
         if (overwrites[',']) {
-          newKeys.push({
+          row.splice(where, 0, {
             value: overwrites[','],
             ratio: 1,
-            keyCode:
-            overwrites[','].charCodeAt(0)
+            keyCode: overwrites[','].charCodeAt(0)
           });
         } else if (overwrites[','] !== false) {
-          newKeys.push({
+          row.splice(where, 0, {
             value: ',',
             ratio: 1,
             keyCode: 44
           });
         }
 
-        newKeys.push({ value: '&nbsp', ratio: ratio, keyCode: KeyboardEvent.DOM_VK_SPACE });
-
         if (overwrites['.']) {
-          newKeys.push({
+          row.splice(next, 0, {
             value: overwrites['.'],
             ratio: 1,
             keyCode: overwrites['.'].charCodeAt(0)
           });
         } else if (overwrites['.'] !== false) {
-          newKeys.push({
+          row.splice(next, 0, {
             value: '.',
             ratio: 1,
             keyCode: 46
@@ -175,74 +153,104 @@ const IMEController = (function() {
 
       break;
     }
-
-    return newKeys;
   };
 
   // build the actual layout depending on baseLayout selected, the input's type and layoutMode
-  function _buildLayout(baseLayout, inputType, layoutMode, uppercase) {
+  function _buildLayout(baseLayout, inputType, layoutMode) {
 
-    function deepCopy(obj) {
-      return JSON.parse(JSON.stringify(obj));
+    function copy(obj) {
+      var newObj = {};
+      for (var prop in obj) if (obj.hasOwnProperty(prop)) {
+        newObj[prop] = obj[prop]
+      }
+      return newObj;
     }
 
-    var layout, l,
-        switchKey,
-        newKeys = [],
-        ratio = 8;
-
-    // these types force specific layouts
     if (inputType === 'number' || inputType === 'tel')
-      return deepCopy(Keyboards[inputType + 'Layout']);
+      baseLayout = inputType+'Layout';
 
-    // Clone the layout
-    layout = deepCopy(Keyboards[baseLayout]);
+    var layout = Keyboards[baseLayout];
 
-    // Transform to uppercase
-    if (uppercase) {
-      layout.keys.forEach(function(row) {
-        row.forEach(function(key) {
-          var v = key.value;
+    // look for keyspace (it behaves as the placeholder for special keys)
+    var where = false;
+    for (var r = 0, row; !where && (row = layout.keys[r]); r += 1)
+      for (var c = 0, space; space = layout.keys[r][c]; c += 1) {
+        if (space.keyCode == KeyboardEvent.DOM_VK_SPACE) {
+          where = r;
+          break;
+        }
+      }
 
-          if (layout.upperCase && layout.upperCase[v]) {
-            key.value = layout.upperCase[v];
+    // if found, add special keys
+    if (where) {
 
-          } else {
-            key.value = key.value.toLocaleUpperCase();
-          }
+      // we will perform some alchemy here, so preserve...
+      layout = copy(layout); // the original space row
+      layout.keys = layout.keys.slice(0);
+      row = layout.keys[where] = layout.keys[where].slice(0);
+      space = copy(space);   // and the original space key
+      row[c] = space;
+
+      // switch languages button
+      if (IMEManager.keyboards.length > 1 && !layout['hidesSwitchKey']) {
+        space.ratio -= 1;
+        row.splice(c, 0, {
+          value: '&#x1f310;',
+          ratio: 1,
+          keyCode: SWITCH_KEYBOARD
         });
-      });
-    }
+        c += 1;
+      }
 
-    // Switch Languages button
-    var severalLanguages = IMEManager.keyboards.length > 1 && !layout['hidesSwitchKey'];
-    if (severalLanguages) {
-      // Switch keyboard key
-      // ratio -= 1;
-      newKeys.push({ value: '&#x1f310;', ratio: 1, keyCode: SWITCH_KEYBOARD });
-    }
+      // Alternate layout key
+      // This gives the author the ability to change the alternate layout
+      // key contents
+      var alternateLayoutKey = '?123';
+      if (layout['alternateLayoutKey']) {
+        alternateLayoutKey = layout['alternateLayoutKey'];
+      }
 
-    // Switch ABC/SYMBOLS button
-    if (!layout['disableAlternateLayout']) {
-      console.log('adding layout');
-      switchKey = _getSwitchKey(layoutMode);
-/*      if (severalLanguages === false)
-         switchKey.ratio += 1;
-*/
-      newKeys.push(switchKey);
-      // ratio -= switchKey.ratio;
-    }
-    // Text types specific keys
-    if (!layout['typeInsensitive']) {
-      newKeys = newKeys.concat(_getTypeSensitiveKeys(inputType, ratio, layout.textLayoutOverwrite));
-    }
+      // This gives the author the ability to change the basic layout
+      // key contents
+      var basicLayoutKey = 'ABC';
+      if (layout['basicLayoutKey']) {
+        basicLayoutKey = layout['basicLayoutKey'];
+      }
 
-    // Return key
-    newKeys.push({ value: '↵', ratio: 2, keyCode: KeyEvent.DOM_VK_RETURN });
+      if (!layout['disableAlternateLayout']) {
+        space.ratio -= 2;
+        if (_layoutMode === LAYOUT_MODE_DEFAULT) {
+          row.splice(c, 0, {
+            keyCode: ALTERNATE_LAYOUT,
+            value: alternateLayoutKey,
+            ratio: 2
+          });
+        } else {
+          row.splice(c, 0, {
+            keyCode: BASIC_LAYOUT,
+            value: basicLayoutKey,
+            ratio: 2
+          });
+        }
+        c += 1;
+      }
 
-    // TODO: Review this, why to always discard the last row?
-    layout.keys.pop(); // remove last row
-    layout.keys.push(newKeys);
+      // Text types specific keys
+      var spliceArgs;
+      if (!layout['typeInsensitive']) {
+        _addTypeSensitiveKeys(
+          inputType,
+          row,
+          space,
+          c,
+          layout.textLayoutOverwrite
+        );
+      }
+
+
+    } else {
+      console.warn('No space key found. No special keys will be added.');
+    }
 
     return layout;
   }
@@ -716,8 +724,8 @@ const IMEController = (function() {
     layoutMode = layoutMode || _currentLayout;
     uppercase = uppercase || false;
 
-    _currentLayout = _buildLayout(baseLayout, inputType, layoutMode, uppercase);
-    IMERender.draw(_currentLayout);
+    _currentLayout = _buildLayout(baseLayout, inputType, layoutMode);
+    IMERender.draw(_currentLayout, {uppercase:uppercase});
     _updateTargetWindowHeight();
   }
 
