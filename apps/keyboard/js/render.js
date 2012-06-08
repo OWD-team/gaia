@@ -51,7 +51,7 @@ const IMERender = (function() {
 
     // Append empty accent char menu and key highlight into content HTML
     content += '<span id="keyboard-accent-char-menu-out"><span id="keyboard-accent-char-menu"></span></span>';
-    content += '<span id="keyboard-key-highlight"></span>';
+    content += '<span id="keyboard-key-highlight"><span></span></span>';
 
     this.ime.innerHTML = content;
     this.menu = document.getElementById('keyboard-accent-char-menu');
@@ -62,7 +62,7 @@ const IMERender = (function() {
     var keyHighlight = this.keyHighlight;
     var target = key;
 
-    keyHighlight.textContent = target.textContent;
+    keyHighlight.querySelector("span").textContent = target.textContent;
     keyHighlight.classList.add('show');
 
     var width = keyHighlight.offsetWidth;
