@@ -204,7 +204,7 @@ button::-moz-focus-inner{
   pointer-events: none;
   display: none;
 }
-  #keyboard-key-highlight span {
+  #keyboard-key-highlight .key-inner {
     display: block;
     font-family: 'Keyboard Symbols', 'Open Sans', sans-serif;
     color: #333;
@@ -223,17 +223,15 @@ button::-moz-focus-inner{
     background: #ebebeb;
     /*box-shadow: inset 0 0 0 1px #FFF, 0 0 0.4rem -2px rgba(0, 0, 0, 0.4);*/
   }
-  #keyboard-key-highlight:after {
-    content: "";
+  #keyboard-key-highlight .key-bridge {
     background-color: #ebebeb;
     /*  background: -moz-linear-gradient(#fff, #ebebeb);*/
     border: 1px solid #61646A;
     border-top: none;
-    height: 2.3rem;
+    height: 2.4rem;
     position: absolute;
     top: 100%;
-    left: 0;
-    right: 0;
+    left: 50%;
     z-index: 200;
     margin: -1px 1rem 0;
     border-radius: 0 0 0.3rem 0.3rem;
