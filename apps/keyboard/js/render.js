@@ -81,6 +81,7 @@ const IMERender = (function() {
 
     keyHighlight.style.top = top + 'px';
     keyHighlight.style.left = left + 'px';
+    keyHighlight.querySelector("#key-string").style.width = keyWidth + 'px';
     keyHighlight.querySelector(".key-bridge").style.width = keyWidth + 'px';
     keyHighlight.querySelector(".key-bridge").style.marginLeft = keyWidth/2*-1 + 'px';
   }

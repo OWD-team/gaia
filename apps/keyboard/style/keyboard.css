@@ -209,14 +209,14 @@ button::-moz-focus-inner{
     font-family: 'Keyboard Symbols', 'Open Sans', sans-serif;
     color: #333;
     line-height: 5rem;
-    min-width: 5rem;
     font-size: 3rem;
-    padding: 0 5px;
-    margin-top: -50px;
+    padding: 0 1rem;
+    margin-top: -3rem;
     text-align: center;
     border: 1px solid #fff;
     border-radius: 0.3rem;
     -moz-background-clip: padding;
+    -moz-box-sizing: content-box;
     background-color: #ebebeb;
   /*  background: -moz-linear-gradient(#fff, #ebebeb);*/
     border: 1px solid #61646A;
@@ -228,7 +228,7 @@ button::-moz-focus-inner{
     /*  background: -moz-linear-gradient(#fff, #ebebeb);*/
     border: 1px solid #61646A;
     border-top: none;
-    height: 2.4rem;
+    height: 2rem;
     position: absolute;
     top: 100%;
     left: 50%;
