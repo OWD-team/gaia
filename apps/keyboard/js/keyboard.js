@@ -204,35 +204,33 @@ const IMEManager = {
     var keyHighlight = this.keyHighlight;
     var target = this.currentKey;
 
-    keyHighlight.classList.remove('show');
-
     if (!target || target.dataset.keyboard)
       return;
 
-    keyHighlight.textContent = target.textContent;
-    keyHighlight.classList.add('show');
-
-    var width = keyHighlight.offsetWidth;
-    var top = target.offsetTop;
-    var left = target.offsetLeft + target.offsetWidth / 2 - width / 2;
-
-    var menu = this.menu;
-    if (target.parentNode === menu) {
-      top += menu.offsetTop;
-      left += menu.offsetLeft;
-    }
-
-    var candidatePanel = this.candidatePanel;
-    if (target.parentNode === candidatePanel) {
-      top += candidatePanel.offsetTop - candidatePanel.scrollTop;
-      left += candidatePanel.offsetLeft - candidatePanel.scrollLeft;
-    }
-
-    left = Math.max(left, 5);
-    left = Math.min(left, window.innerWidth - width - 5);
-
-    keyHighlight.style.top = top + 'px';
-    keyHighlight.style.left = left + 'px';
+    // keyHighlight.textContent = target.textContent;
+    target.classList.add('highlighted');
+    // 
+    // var width = keyHighlight.offsetWidth;
+    // var top = target.offsetTop;
+    // var left = target.offsetLeft + target.offsetWidth / 2 - width / 2;
+    // 
+    // var menu = this.menu;
+    // if (target.parentNode === menu) {
+    //   top += menu.offsetTop;
+    //   left += menu.offsetLeft;
+    // }
+    // 
+    // var candidatePanel = this.candidatePanel;
+    // if (target.parentNode === candidatePanel) {
+    //   top += candidatePanel.offsetTop - candidatePanel.scrollTop;
+    //   left += candidatePanel.offsetLeft - candidatePanel.scrollLeft;
+    // }
+    // 
+    // left = Math.max(left, 5);
+    // left = Math.min(left, window.innerWidth - width - 5);
+    // 
+    // keyHighlight.style.top = top + 'px';
+    // keyHighlight.style.left = left + 'px';
   },
 
   showAccentCharMenu: function km_showAccentCharMenu() {
@@ -736,10 +734,10 @@ const IMEManager = {
 
       case 'mouseup':
         this.isPressing = false;
-
+        
         if (!this.currentKey)
           return;
-
+        this.currentKey.classList.remove('highlighted');
         clearTimeout(this._deleteTimeout);
         clearInterval(this._deleteInterval);
         clearTimeout(this._menuTimeout);
@@ -942,10 +940,25 @@ const IMEManager = {
         break;
     }
   },
+  
+  resizeUI: function() {
+
+       if ( window.innerWidth > 0 && window.innerWidth < window.innerHeight ) {
+          var changeScale = window.innerWidth / 32;
+          document.documentElement.style.fontSize = changeScale + 'px';
+         console.log( "portrait");
+        } 
+        if ( window.innerWidth > window.innerHeight) {
+          var changeScale = window.innerWidth / 64;
+          document.documentElement.style.fontSize = changeScale + 'px';
+          console.log( "landscape");
+        }
+
+    },
 
   updateLayout: function km_updateLayout(keyboard) {
     var layout;
-
+    this.resizeUI();
     switch (this.currentType) {
       case 'number':
         layout = Keyboards['numberLayout'];
@@ -980,12 +993,12 @@ const IMEManager = {
     var buildKey = function buildKey(code, label, className, ratio, alt,
                                      compositeKey) {
 
-      return '<span class="keyboard-key ' + className + '"' +
+      return '<button class="keyboard-key ' + className + '"' +
         (code ? ' data-keycode="' + code + '"' : '') +
-        ' style="width:' + (size * ratio - 4) + 'px"' +
+         'style="-moz-box-flex:' + width +'"' +
         ((alt) ? ' data-alt="' + alt + '" ' : '') +
         (compositeKey ? ' data-compositekey="' + compositeKey + '" ' : '') +
-      '>' + label + '</span>';
+      '><span>' + label + '</span></button>';
     };
 
     layout.keys.forEach((function buildKeyboardRow(row) {
