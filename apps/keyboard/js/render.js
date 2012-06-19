@@ -15,6 +15,16 @@ const IMERender = (function() {
 
   var _menuKey, _altContainer;
 
+  function _isArea(evt) {
+    return evt.target.tagName === 'BUTTON' ? evt.target.id : null;
+  }
+
+  function _touchBasedIsArea(evt) {
+    var touch = evt.changedTouches[0];
+    var element = document.elementFromPoint(touch.screenX, touch.screenY);
+    return element.tagName === 'BUTTON' ? element.id : null;
+  }
+
   // Initiaze the render. It needs some business logic to determine:
   //   1- The uppercase for a key object
   //   2- When a key is a special key
@@ -79,8 +89,8 @@ const IMERender = (function() {
         if (key.compositeKey) {
           dataset.push({'key': 'compositekey', 'value': key.compositeKey});
         }
-
-        content += buildKey(keyChar, className, keyWidth, dataset);
+        var id = [nrow, ncolumn, null];
+        content += buildKey(keyChar, className, keyWidth, dataset, JSON.stringify(id));
 
       }));
       content += '</div>';
@@ -227,10 +237,12 @@ const IMERender = (function() {
         {key: 'keyboard', value: kbr},
         {key: 'keycode', value: switchCode}
       ];
+      var id = [key.dataset.row, key.dataset.column, kbr];
       content += buildKey(
         Keyboards[kbr].menuLabel,
         className, cssWidth,
-        dataset
+        dataset,
+        JSON.stringify(id)
       );
     }
     menu.innerHTML = content;
@@ -272,13 +284,14 @@ const IMERender = (function() {
     }
 
     // Build a key for each alternative
-    altCharsCurrent.forEach(function(keyChar) {
+    altCharsCurrent.forEach(function(keyChar, index) {
       var keyCode = keyChar.keyCode || keyChar.charCodeAt(0);
       var dataset = [{'key': 'keycode', 'value': keyCode}];
       var label = keyChar.label || keyChar;
       if (label.length > 1)
         dataset.push({'key': 'compositekey', 'value': label});
-      content += buildKey(label, '', cssWidth, dataset);
+      var id = [key.dataset.row, key.dataset.column, index];
+      content += buildKey(label, '', cssWidth, dataset, JSON.stringify(id));
     });
     this.menu.innerHTML = content;
 
@@ -352,8 +365,8 @@ const IMERender = (function() {
     return toggleButton;
   };
 
-  var buildKey = function buildKey(label, className, width, dataset) {
-    var content = '<button class="keyboard-key ' + className + '"';
+  var buildKey = function buildKey(label, className, width, dataset, id) {
+    var content = '<button id="' + id + '" class="keyboard-key ' + className + '"';
     dataset.forEach(function(data) {
       content += ' data-' + data.key + '="' + data.value + '" ';
     });
@@ -376,6 +389,8 @@ const IMERender = (function() {
     'setUpperCaseLock': setUpperCaseLock,
     'resizeUI': resizeUI,
     'showCandidates': showCandidates,
-    'showPendingSymbols': showPendingSymbols
+    'showPendingSymbols': showPendingSymbols,
+    'isArea' : _isArea,
+    'touchBasedIsArea' : _touchBasedIsArea
   };
 })();

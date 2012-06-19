@@ -53,7 +53,7 @@ const IMEManager = {
   keyboardSettingGroups: {
     'english': ['en'],
     'dvorak': ['en-Dvorak'],
-    'otherlatins': ['fr', 'de', 'nb', 'sk', 'tr', 'es', 'pt_BR'],
+    'otherlatins': ['tid_es', 'fr', 'de', 'nb', 'sk', 'tr', 'es', 'pt_BR'],
     'cyrillic': ['ru', 'sr-Cyrl'],
     'hebrew': ['he'],
     'zhuyin': ['zh-Hant-Zhuyin'],

@@ -894,6 +894,7 @@ const IMEController = (function() {
   };
 
   // Initialize the keyboard (exposed, controlled by IMEManager)
+  var srfController = null;
   function _init() {
 
     // Support function for render
@@ -904,6 +905,15 @@ const IMEController = (function() {
       return hasSpecialCode || key.keyCode <= 0;
     }
     IMERender.init(_getUpperCaseValue, isSpecialKeyObj);
+
+    // create the surface controller
+    srfController = new eal.Surface(
+      IMERender.ime, 
+      {
+        isArea:IMERender.touchBasedIsArea,
+        multitouch: true
+      }
+    );
 
     // Attach event listeners
     for (var event in _imeEvents) {
