@@ -192,15 +192,19 @@ eal.Surface = function(surfaceElement, spec) {
     evt.preventDefault();
     var track = _getTouchId(evt);
 
-    var abstractEvts = [_newEvent(track, evt, 'touchsurface')];
+    var abstractEvts = [];
     var newArea = _options.isArea(evt, track);
     if (newArea) {
       _formerArea[track] = _currentArea[track];
       _accessArea[track] = _currentArea[track] = newArea;
       abstractEvts.push(
+        _newEvent(track, evt, 'touchsurface', _currentArea[track]),
         _newEvent(track, evt, 'enterarea', _currentArea[track])
       );
       _enterarea[track] = _currentArea[track];
+
+    } else {
+      abstractEvts.push(_newEvent(track, evt, 'touchsurface'));
     }
 
     _handleAbstractEvents(track, abstractEvts, evt);

@@ -25,6 +25,10 @@ const IMERender = (function() {
     return element.tagName === 'BUTTON' ? element.id : null;
   }
 
+  function _getKey(id) {
+    return document.getElementById(id);
+  }
+
   // Initiaze the render. It needs some business logic to determine:
   //   1- The uppercase for a key object
   //   2- When a key is a special key
@@ -391,6 +395,7 @@ const IMERender = (function() {
     'showCandidates': showCandidates,
     'showPendingSymbols': showPendingSymbols,
     'isArea' : _isArea,
-    'touchBasedIsArea' : _touchBasedIsArea
+    'touchBasedIsArea' : _touchBasedIsArea,
+    'getKey': _getKey
   };
 })();

@@ -36,6 +36,7 @@ const IMEController = (function() {
       _isWaitingForSpaceSecondTap = false,
       _isUpperCase = false,
       _baseLayoutName = '',
+      _currentTrack = null,
       _currentLayout = null,
       _currentLayoutMode = LAYOUT_MODE_DEFAULT,
       _currentKey = null,
@@ -893,6 +894,74 @@ const IMEController = (function() {
     'mousemove': _onMouseMove
   };
 
+  function _onLeaveArea(evt, abortingCurrent) {
+    // ignore tap events produce by former touchs
+    // unless we are precisely aborting the current one
+    if (!abortingCurrent && _currentTrack !== evt.detail.track)
+      return;
+
+    IMERender.unHighlightKey(_currentKey);
+  }
+
+  function _onTap(evt, abortingCurrent) {
+    var compositeKey, keycode;
+
+    // ignore tap events produce by former touchs
+    // unless we are precisely aborting the current one
+    if (!abortingCurrent && _currentTrack !== evt.detail.track)
+      return;
+
+    console.log(_currentKey.dataset.keycode);
+
+    // composite keys
+    function sendCompositeKey(compositeKey) {
+      compositeKey.split('').forEach(function sendEachKey(key) {
+        window.navigator.mozKeyboard.sendKey(0, key.charCodeAt(0));
+      });
+    }
+
+    compositeKey = _currentKey.dataset.compositekey;
+    if (compositeKey) {
+      sendCompositeKey(compositeKey);
+      return;
+    }
+
+    // default codes
+    keycode = parseInt(_currentKey.dataset.keycode);
+    _handleMouseDownEvent(keycode);
+  }
+
+  var _newImeEvents = {
+    'touchsurface' : function kc_touchsurface(evt) {
+      if (evt.detail.area !== null)
+        IMEFeedback.triggerFeedback();
+    },
+    'enterarea' : function kc_enterarea(evt) {
+      var track = evt.detail.track;
+      if (_currentTrack === null)
+        _currentTrack = track;
+
+      // if a simultaneous touch, finalize the current before continue
+      if (_currentTrack !== track) {
+        _onLeaveArea(evt, true);
+        _onTap(evt, true);
+        _currentTrack = track;
+      }
+
+      _currentKey = IMERender.getKey(evt.detail.area);
+      IMERender.highlightKey(_currentKey);
+    },
+    'leavearea' : _onLeaveArea,
+    'tap' : _onTap,
+
+    'leavesurface' : function kc_leavesurface(evt) {
+      if (_currentTrack !== evt.detail.track)
+        return;
+
+      _currentKey = null;
+    }
+  };
+
   // Initialize the keyboard (exposed, controlled by IMEManager)
   var srfController = null;
   function _init() {
@@ -916,8 +985,8 @@ const IMEController = (function() {
     );
 
     // Attach event listeners
-    for (var event in _imeEvents) {
-      var callback = _imeEvents[event] || null;
+    for (var event in _newImeEvents) {
+      var callback = _newImeEvents[event] || null;
       if (callback)
         IMERender.ime.addEventListener(event, callback.bind(this));
     }
