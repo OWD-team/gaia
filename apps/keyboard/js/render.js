@@ -294,7 +294,7 @@ const IMERender = (function() {
       var label = keyChar.label || keyChar;
       if (label.length > 1)
         dataset.push({'key': 'compositekey', 'value': label});
-      var id = [key.dataset.row, key.dataset.column, index];
+      var id = [parseInt(key.dataset.row), parseInt(key.dataset.column), index];
       content += buildKey(label, '', cssWidth, dataset, JSON.stringify(id));
     });
     this.menu.innerHTML = content;
@@ -374,7 +374,7 @@ const IMERender = (function() {
     dataset.forEach(function(data) {
       content += ' data-' + data.key + '="' + data.value + '" ';
     });
-    content += ' style="-moz-box-flex:' + width + '"';
+    //content += ' style="-moz-box-flex:' + width + '"';
     content += '><span>' + label + '</span></button>';
     return content;
   };

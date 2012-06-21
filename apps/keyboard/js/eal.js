@@ -3,7 +3,7 @@
 var eal = {};
 (function () {
 
-var _debugBasicEvents = false; // for the underlying events
+var _debugBasicEvents = true; // for the underlying events
 var _debugEvents = true; // for the events dispatched by the controller
 
 function extend(base) {

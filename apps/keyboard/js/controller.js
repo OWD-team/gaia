@@ -406,8 +406,6 @@ const IMEController = (function() {
       return;
     keyObj = _currentLayout.keys[r][c];
 
-    console.log('showing alternatives');
-
     // Handle languages alternatives
     if (keyObj.keyCode === SWITCH_KEYBOARD) {
       IMERender.showKeyboardAlternatives(
@@ -451,6 +449,10 @@ const IMEController = (function() {
       _isUpperCase ? uppercaseValue : value
     );
 
+    IMERender.showAlternativesCharMenu(key, alternatives);
+    _isShowingAlternativesMenu = true;
+
+/*
     // Locked limits
     // TODO: look for [LOCKED_AREA]
     var top = getWindowTop(key);
@@ -490,7 +492,7 @@ const IMEController = (function() {
       _menuLockedArea.width / IMERender.menu.children.length;
     for (var prop in _menuLockedArea)
       console.log(prop + ': ' + _menuLockedArea[prop]);
-
+*/
   }
 
   // Hide alternatives.
@@ -919,6 +921,14 @@ const IMEController = (function() {
     if (!abortingCurrent && _currentTrack !== evt.detail.track)
       return;
 
+    // Program to hide alterantives
+    _hideMenuTimeout = window.setTimeout(
+      function hideMenuTimeout() {
+        _hideAlternatives();
+      },
+      _kHideAlternativesCharMenuTimeout
+    );
+
     IMERender.unHighlightKey(_currentKey);
   }
 
@@ -1077,7 +1087,6 @@ const IMEController = (function() {
 
       // shift locks uppercase
       case KeyEvent.DOM_VK_CAPS_LOCK:
-        console.log('lock');
         _isUpperCase = _isUpperCaseLocked = true;
         _draw(
           _baseLayoutName, _currentInputType,
@@ -1116,15 +1125,14 @@ const IMEController = (function() {
     if (_currentTrack !== evt.detail.track)
       return;
 
-
     keyCode = parseInt(_currentKey.dataset.keycode);
-    console.log('xp '+keyCode);
     if (keyCode === KeyEvent.DOM_VK_BACK_SPACE)
       _sendDelete(true);
   }
 
   function _onLongPress(evt) {
     _onPress(evt);
+    _showAlternatives(_currentKey);
   }
 
   function _onKeepPressing(evt) {
