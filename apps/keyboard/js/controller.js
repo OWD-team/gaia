@@ -15,7 +15,7 @@ const IMEController = (function() {
       SWITCH_KEYBOARD = -3,
       TOGGLE_CANDIDATE_PANEL = -4;
 
-  var specialCodes = [
+  var _specialCodes = [
     KeyEvent.DOM_VK_BACK_SPACE,
     KeyEvent.DOM_VK_CAPS_LOCK,
     KeyEvent.DOM_VK_RETURN,
@@ -37,6 +37,7 @@ const IMEController = (function() {
       _isUpperCase = false,
       _baseLayoutName = '',
       _currentTrack = null,
+      _currentKeyId = '',
       _currentLayout = null,
       _currentLayoutMode = LAYOUT_MODE_DEFAULT,
       _currentKey = null,
@@ -382,7 +383,7 @@ const IMEController = (function() {
 
   // Return the upper value for a key object
   function _getUpperCaseValue(key) {
-    var hasSpecialCode = specialCodes.indexOf(key.keyCode) > -1;
+    var hasSpecialCode = _specialCodes.indexOf(key.keyCode) > -1;
     if (key.keyCode < 0 || hasSpecialCode || key.compositeKey)
       return key.value;
 
@@ -882,6 +883,7 @@ const IMEController = (function() {
 
   // Turn to default values
   function _reset() {
+    _currentTrack = null;
     _currentLayoutMode = LAYOUT_MODE_DEFAULT;
     _isUpperCase = false;
   }
@@ -894,6 +896,23 @@ const IMEController = (function() {
     'mousemove': _onMouseMove
   };
 
+  function _onEnterArea(evt) {
+    var track = evt.detail.track;
+    if (_currentTrack === null)
+      _currentTrack = track;
+
+    // if a simultaneous touch, finalize the current before continue
+    if (_currentTrack !== track) {
+      _onLeaveArea(evt, true);
+      _onTap(evt, true);
+      _currentTrack = track;
+    }
+
+    _currentKeyId = evt.detail.area;
+    _currentKey = IMERender.getKey(_currentKeyId);
+    IMERender.highlightKey(_currentKey);
+  }
+
   function _onLeaveArea(evt, abortingCurrent) {
     // ignore tap events produce by former touchs
     // unless we are precisely aborting the current one
@@ -904,14 +923,13 @@ const IMEController = (function() {
   }
 
   function _onTap(evt, abortingCurrent) {
-    var compositeKey, keycode;
+    var compositeKey, keyCode;
 
     // ignore tap events produce by former touchs
     // unless we are precisely aborting the current one
     if (!abortingCurrent && _currentTrack !== evt.detail.track)
       return;
 
-    console.log(_currentKey.dataset.keycode);
 
     // composite keys
     function sendCompositeKey(compositeKey) {
@@ -927,39 +945,175 @@ const IMEController = (function() {
     }
 
     // default codes
-    keycode = parseInt(_currentKey.dataset.keycode);
-    _handleMouseDownEvent(keycode);
+    keyCode = parseInt(_currentKey.dataset.keycode);
+    switch (keyCode) {
+
+      // Layout mode change
+      case BASIC_LAYOUT:
+      case ALTERNATE_LAYOUT:
+      case KeyEvent.DOM_VK_ALT:
+        _handleSymbolLayoutRequest(keyCode);
+      break;
+
+      // Switch language (keyboard)
+      case SWITCH_KEYBOARD:
+
+        // If the user has specify a keyboard in the menu,
+        // switch to that keyboard.
+        if (_currentKey.dataset.keyboard) {
+          _baseLayoutName = _currentKey.dataset.keyboard;
+
+        // Cycle between languages (keyboard)
+        } else {
+          var keyboards = IMEManager.keyboards;
+          var index = keyboards.indexOf(_baseLayoutName);
+          index = (index + 1) % keyboards.length;
+          _baseLayoutName = IMEManager.keyboards[index];
+        }
+
+        _reset();
+        _draw(
+          _baseLayoutName, _currentInputType,
+          _currentLayoutMode, _isUpperCase
+        );
+
+        if (Keyboards[_baseLayoutName].type == 'ime') {
+          if (_currentEngine().show) {
+            _currentEngine().show(_currentInputType);
+          }
+        }
+
+        break;
+
+      // Expand / shrink the candidate panel
+      case TOGGLE_CANDIDATE_PANEL:
+        if (IMERender.ime.classList.contains('candidate-panel')) {
+          IMERender.ime.classList.remove('candidate-panel');
+          IMERender.ime.classList.add('full-candidate-panel');
+        } else {
+          IMERender.ime.classList.add('candidate-panel');
+          IMERender.ime.classList.remove('full-candidate-panel');
+        }
+        break;
+
+      // Shift or caps lock
+      case KeyEvent.DOM_VK_CAPS_LOCK:
+
+        // Toggle caps
+        _isUpperCase = !_isUpperCase;
+        _isUpperCaseLocked = false;
+        _draw(
+          _baseLayoutName, _currentInputType,
+          _currentLayoutMode, _isUpperCase
+        );
+
+        // Keyboard updated: all buttons recreated so event target is lost.
+        var capsLockKey = document.querySelector(
+          'button[data-keycode="' + KeyboardEvent.DOM_VK_CAPS_LOCK + '"]'
+        );
+        IMERender.setUpperCaseLock(
+          capsLockKey,
+          _isUpperCase
+        );
+
+      break;
+
+      // Return key
+      case KeyEvent.DOM_VK_RETURN:
+        if (Keyboards[_baseLayoutName].type == 'ime' &&
+            _currentLayoutMode === LAYOUT_MODE_DEFAULT) {
+          _currentEngine().click(keyCode);
+          break;
+        }
+
+        window.navigator.mozKeyboard.sendKey(keyCode, 0);
+      break;
+
+      // Normal key
+      default:
+        _handleMouseDownEvent(keyCode);
+        break;
+    }
+
+  }
+
+  function _onDoubleTap(evt) {
+    var keyCode;
+    var doubleTapCodes = [KeyEvent.DOM_VK_SPACE, KeyEvent.DOM_VK_CAPS_LOCK];
+
+    if (_currentTrack !== evt.detail.track)
+      return;
+
+    keyCode = parseInt(_currentKey.dataset.keycode);
+
+    // it is not a double tap relevant key, do nothing
+    if (doubleTapCodes.indexOf(keyCode) < 0) {
+      _onTap(evt);
+      return;
+    }
+
+    // double tap relevant keys
+    switch (keyCode) {
+      // space adds a point
+      case KeyEvent.DOM_VK_SPACE:
+        if (Keyboards[_baseLayoutName].type == 'ime' &&
+          _currentLayoutMode === LAYOUT_MODE_DEFAULT) {
+
+          //TODO: need to define the inteface for double tap handling
+          //_currentEngine().doubleTap(keyCode);
+          return;
+        }
+
+        // Send a delete key to remove the previous space sent
+        window.navigator.mozKeyboard.sendKey(KeyEvent.DOM_VK_BACK_SPACE,
+                                             0);
+
+        // Send the . symbol followed by a space
+        window.navigator.mozKeyboard.sendKey(0, 46);
+      break;
+
+      // shift locks uppercase
+      case KeyEvent.DOM_VK_CAPS_LOCK:
+        console.log('lock');
+        _isUpperCase = _isUpperCaseLocked = true;
+        _draw(
+          _baseLayoutName, _currentInputType,
+          _currentLayoutMode, _isUpperCase
+        );
+
+        // Keyboard updated: all buttons recreated so event target is lost.
+        var capsLockKey = document.querySelector(
+          'button[data-keycode="' + KeyboardEvent.DOM_VK_CAPS_LOCK + '"]'
+        );
+        IMERender.setUpperCaseLock(
+          capsLockKey,
+          'locked'
+        );
+
+      break;
+    }
+
+  }
+
+  function _onTouchSurface(evt) {
+    if (evt.detail.area !== null)
+      IMEFeedback.triggerFeedback();
+  }
+
+  function _onLeaveSurface(evt) {
+    if (_currentTrack !== evt.detail.track)
+      return;
+
+    _currentKey = null;
   }
 
   var _newImeEvents = {
-    'touchsurface' : function kc_touchsurface(evt) {
-      if (evt.detail.area !== null)
-        IMEFeedback.triggerFeedback();
-    },
-    'enterarea' : function kc_enterarea(evt) {
-      var track = evt.detail.track;
-      if (_currentTrack === null)
-        _currentTrack = track;
-
-      // if a simultaneous touch, finalize the current before continue
-      if (_currentTrack !== track) {
-        _onLeaveArea(evt, true);
-        _onTap(evt, true);
-        _currentTrack = track;
-      }
-
-      _currentKey = IMERender.getKey(evt.detail.area);
-      IMERender.highlightKey(_currentKey);
-    },
+    'touchsurface' : _onTouchSurface,
+    'enterarea' : _onEnterArea,
     'leavearea' : _onLeaveArea,
     'tap' : _onTap,
-
-    'leavesurface' : function kc_leavesurface(evt) {
-      if (_currentTrack !== evt.detail.track)
-        return;
-
-      _currentKey = null;
-    }
+    'doubletap' : _onDoubleTap,
+    'leavesurface' : _onLeaveSurface
   };
 
   // Initialize the keyboard (exposed, controlled by IMEManager)
@@ -970,7 +1124,7 @@ const IMEController = (function() {
     function isSpecialKeyObj(key) {
       var hasSpecialCode = !KeyEvent.DOM_VK_SPACE &&
                            key.keyCode &&
-                           specialCodes.indexOf(key.keyCode) !== -1;
+                           _specialCodes.indexOf(key.keyCode) !== -1;
       return hasSpecialCode || key.keyCode <= 0;
     }
     IMERender.init(_getUpperCaseValue, isSpecialKeyObj);
