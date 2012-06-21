@@ -930,7 +930,6 @@ const IMEController = (function() {
     if (!abortingCurrent && _currentTrack !== evt.detail.track)
       return;
 
-
     // composite keys
     function sendCompositeKey(compositeKey) {
       compositeKey.split('').forEach(function sendEachKey(key) {
@@ -1029,10 +1028,14 @@ const IMEController = (function() {
         window.navigator.mozKeyboard.sendKey(keyCode, 0);
       break;
 
+      // Delete is ignores
+      case KeyEvent.DOM_VK_BACK_SPACE:
+      break;
+
       // Normal key
       default:
         _handleMouseDownEvent(keyCode);
-        break;
+      break;
     }
 
   }
@@ -1107,12 +1110,36 @@ const IMEController = (function() {
     _currentKey = null;
   }
 
+  function _onPress(evt) {
+    var keyCode;
+
+    if (_currentTrack !== evt.detail.track)
+      return;
+
+
+    keyCode = parseInt(_currentKey.dataset.keycode);
+    console.log('xp '+keyCode);
+    if (keyCode === KeyEvent.DOM_VK_BACK_SPACE)
+      _sendDelete(true);
+  }
+
+  function _onLongPress(evt) {
+    _onPress(evt);
+  }
+
+  function _onKeepPressing(evt) {
+    _onPress(evt);
+  }
+
   var _newImeEvents = {
     'touchsurface' : _onTouchSurface,
     'enterarea' : _onEnterArea,
     'leavearea' : _onLeaveArea,
     'tap' : _onTap,
     'doubletap' : _onDoubleTap,
+    'pressarea' : _onPress,
+    'longpress' : _onLongPress,
+    'keeppressing' : _onKeepPressing,
     'leavesurface' : _onLeaveSurface
   };
 
