@@ -514,142 +514,6 @@ const IMEController = (function() {
   // EVENTS HANDLERS
   //
 
-  // When user touches the keyboard
-  function _onMouseDown(evt) {
-    var keyCode;
-
-    _isPressing = true;
-    _currentKey = evt.target;
-    if (!_isNormalKey(_currentKey))
-      return;
-    keyCode = parseInt(_currentKey.dataset.keycode);
-
-    // Feedback
-    IMERender.highlightKey(_currentKey);
-    IMEFeedback.triggerFeedback();
-
-    // Key alternatives when long press
-    _menuTimeout = window.setTimeout((function menuTimeout() {
-      _showAlternatives(_currentKey);
-    }), _kAccentCharMenuTimeout);
-
-    // Special keys (such as delete) response when pressing (not releasing)
-    // Furthermore, delete key has a repetition behavior
-    if (keyCode === KeyEvent.DOM_VK_BACK_SPACE) {
-
-      // First, just pressing (without feedback)
-      _sendDelete(false);
-
-      // Second, after a delay (with feedback)
-      _deleteTimeout = window.setTimeout(function() {
-        _sendDelete(true);
-
-        // Third, after shorter delay (with feedback too)
-        _deleteInterval = setInterval(function() {
-          _sendDelete(true);
-        }, _kRepeatRate);
-
-      }, _kRepeatTimeout);
-
-    }
-  }
-
-  // [LOCKED_AREA] TODO:
-  // This is an agnostic way to improve the usability of the alternatives.
-  // It consists into compute an area where the user movement is redirected
-  // to the alternative menu keys but I would prefer another alternative
-  // with better performance.
-  function _onMouseMove(evt) {
-    var altCount, width, menuChildren;
-
-    // Control locked zone for menu
-    if (_isShowingAlternativesMenu &&
-        _menuLockedArea &&
-        evt.screenY >= _menuLockedArea.top &&
-        evt.screenY <= _menuLockedArea.bottom &&
-        evt.screenX >= _menuLockedArea.left &&
-        evt.screenX <= _menuLockedArea.right) {
-
-      clearTimeout(_hideMenuTimeout);
-      menuChildren = IMERender.menu.children;
-
-      var event = document.createEvent('MouseEvent');
-      event.initMouseEvent(
-        'mouseover', true, true, window, 0,
-        0, 0, 0, 0,
-        false, false, false, false, 0, null
-      );
-
-      menuChildren[Math.floor(
-        (evt.screenX - _menuLockedArea.left) / _menuLockedArea.ratio
-      )].dispatchEvent(event);
-      return;
-    }
-
-  }
-
-  // When user changes to another button (it handle what happend if the user
-  // keeps pressing the same area. Similar to _onMouseDown)
-  function _onMouseOver(evt) {
-    var target = evt.target;
-    var keyCode = parseInt(target.dataset.keycode);
-
-    // Do nothing if no pressing (mouse events), same key or not a normal key
-    if (!_isPressing || _currentKey == target || !_isNormalKey(target))
-      return;
-
-    // Update highlight: remove from older
-    IMERender.unHighlightKey(_currentKey);
-
-    // Ignore if moving over delete key
-    if (keyCode == KeyEvent.DOM_VK_BACK_SPACE) {
-      _currentKey = null;
-      return;
-    }
-
-    // Update highlight: add to the new
-    IMERender.highlightKey(target);
-    _currentKey = target;
-
-    clearTimeout(_deleteTimeout);
-    clearInterval(_deleteInterval);
-    clearTimeout(_menuTimeout);
-
-    // Control hide of alternatives menu
-    if (target.parentNode === IMERender.menu) {
-      clearTimeout(_hideMenuTimeout);
-    } else {
-      clearTimeout(_hideMenuTimeout);
-      _hideMenuTimeout = window.setTimeout(
-        function hideMenuTimeout() {
-          _hideAlternatives();
-        },
-        _kHideAlternativesCharMenuTimeout
-      );
-    }
-
-    // Control showing alternatives menu
-    _menuTimeout = window.setTimeout((function menuTimeout() {
-      _showAlternatives(target);
-    }), _kAccentCharMenuTimeout);
-
-  }
-
-  // When user leaves the keyboard
-  function _onMouseLeave(evt) {
-    if (!_isPressing || !_currentKey)
-      return;
-
-    IMERender.unHighlightKey(_currentKey);
-
-    // Program alternatives to hide
-    _hideMenuTimeout = window.setTimeout(function hideMenuTimeout() {
-        _hideAlternatives();
-    }, _kHideAlternativesCharMenuTimeout);
-
-    _currentKey = null;
-  }
-
   // Handle the default behavior for a pressed key
   function _handleMouseDownEvent(keyCode) {
 
@@ -676,227 +540,12 @@ const IMEController = (function() {
     }
   }
 
-  // The user is releasing a key so the key has been pressed. The meat is here.
-  function _onMouseUp(evt) {
-    _isPressing = false;
-
-    if (!_currentKey)
-      return;
-
-    clearTimeout(_deleteTimeout);
-    clearInterval(_deleteInterval);
-    clearTimeout(_menuTimeout);
-
-    _hideAlternatives();
-
-    var target = _currentKey;
-    var keyCode = parseInt(target.dataset.keycode);
-    if (!_isNormalKey(target))
-      return;
-
-    // IME candidate selected
-    var dataset = target.dataset;
-    if (dataset.selection) {
-      _currentEngine().select(target.textContent, dataset.data);
-      IMERender.highlightKey(target);
-      _currentKey = null;
-      return;
-    }
-
-    IMERender.unHighlightKey(target);
-    _currentKey = null;
-
-    // Delete is a special key, it reacts when pressed not released
-    if (keyCode == KeyEvent.DOM_VK_BACK_SPACE)
-      return;
-
-    // Reset the flag when a non-space key is pressed,
-    // used in space key double tap handling
-    if (keyCode != KeyEvent.DOM_VK_SPACE)
-      _isContinousSpacePressed = false;
-
-    // Handle composite key (key that sends more than one code)
-    var sendCompositeKey = function sendCompositeKey(compositeKey) {
-        compositeKey.split('').forEach(function sendEachKey(key) {
-          window.navigator.mozKeyboard.sendKey(0, key.charCodeAt(0));
-        });
-    }
-
-    var compositeKey = target.dataset.compositekey;
-    if (compositeKey) {
-      sendCompositeKey(compositeKey);
-      return;
-    }
-
-    // Handle normal key
-    switch (keyCode) {
-
-      // Layout mode change
-      case BASIC_LAYOUT:
-      case ALTERNATE_LAYOUT:
-      case KeyEvent.DOM_VK_ALT:
-        _handleSymbolLayoutRequest(keyCode);
-      break;
-
-      // Switch language (keyboard)
-      case SWITCH_KEYBOARD:
-
-        // If the user has specify a keyboard in the menu,
-        // switch to that keyboard.
-        if (target.dataset.keyboard) {
-          _baseLayoutName = target.dataset.keyboard;
-
-        // Cycle between languages (keyboard)
-        } else {
-          var keyboards = IMEManager.keyboards;
-          var index = keyboards.indexOf(_baseLayoutName);
-          index = (index + 1) % keyboards.length;
-          _baseLayoutName = IMEManager.keyboards[index];
-        }
-
-        _reset();
-        _draw(
-          _baseLayoutName, _currentInputType,
-          _currentLayoutMode, _isUpperCase
-        );
-
-        if (Keyboards[_baseLayoutName].type == 'ime') {
-          if (_currentEngine().show) {
-            _currentEngine().show(_currentInputType);
-          }
-        }
-
-        break;
-
-      // Expand / shrink the candidate panel
-      case TOGGLE_CANDIDATE_PANEL:
-        if (IMERender.ime.classList.contains('candidate-panel')) {
-          IMERender.ime.classList.remove('candidate-panel');
-          IMERender.ime.classList.add('full-candidate-panel');
-        } else {
-          IMERender.ime.classList.add('candidate-panel');
-          IMERender.ime.classList.remove('full-candidate-panel');
-        }
-        break;
-
-      // Shift or caps lock
-      case KeyEvent.DOM_VK_CAPS_LOCK:
-
-        // Already waiting for caps lock
-        if (_isWaitingForSecondTap) {
-          _isWaitingForSecondTap = false;
-
-          _isUpperCase = _isUpperCaseLocked = true;
-          _draw(
-            _baseLayoutName, _currentInputType,
-            _currentLayoutMode, _isUpperCase
-          );
-
-        // Normal behavior: set timeout for second tap and toggle caps
-        } else {
-
-          _isWaitingForSecondTap = true;
-          window.setTimeout(
-            function() {
-              _isWaitingForSecondTap = false;
-            },
-            _kCapsLockTimeout
-          );
-
-          // Toggle caps
-          _isUpperCase = !_isUpperCase;
-          _isUpperCaseLocked = false;
-          _draw(
-            _baseLayoutName, _currentInputType,
-            _currentLayoutMode, _isUpperCase
-          );
-        }
-
-        // Keyboard updated: all buttons recreated so event target is lost.
-        var capsLockKey = document.querySelector(
-          'button[data-keycode="' + KeyboardEvent.DOM_VK_CAPS_LOCK + '"]'
-        );
-        IMERender.setUpperCaseLock(
-          capsLockKey,
-          _isUpperCaseLocked ? 'locked' : _isUpperCase
-        );
-
-      break;
-
-      // Return key
-      case KeyEvent.DOM_VK_RETURN:
-        if (Keyboards[_baseLayoutName].type == 'ime' &&
-            _currentLayoutMode === LAYOUT_MODE_DEFAULT) {
-          _currentEngine().click(keyCode);
-          break;
-        }
-
-        window.navigator.mozKeyboard.sendKey(keyCode, 0);
-      break;
-
-      // Space key need a special treatmen due to the point added when double
-      // tapped.
-      case KeyEvent.DOM_VK_SPACE:
-        if (_isWaitingForSpaceSecondTap &&
-            !_isContinousSpacePressed) {
-
-          if (Keyboards[_baseLayoutName].type == 'ime' &&
-            _currentLayoutMode === LAYOUT_MODE_DEFAULT) {
-
-            //TODO: need to define the inteface for double tap handling
-            //_currentEngine().doubleTap(keyCode);
-            break;
-          }
-
-          // Send a delete key to remove the previous space sent
-          window.navigator.mozKeyboard.sendKey(KeyEvent.DOM_VK_BACK_SPACE,
-                                               0);
-
-          // Send the . symbol followed by a space
-          window.navigator.mozKeyboard.sendKey(0, 46);
-          window.navigator.mozKeyboard.sendKey(0, keyCode);
-
-          _isWaitingForSpaceSecondTap = false;
-
-          // A flag to prevent continous replacement of space with "."
-          _isContinousSpacePressed = true;
-          break;
-        }
-
-        // Program timeout for second tap
-        _isWaitingForSpaceSecondTap = true;
-        window.setTimeout(
-          (function removeSpaceDoubleTapTimeout() {
-            _isWaitingForSpaceSecondTap = false;
-          }).bind(this),
-          _kSpaceDoubleTapTimeout
-        );
-
-        // After all: treat as a normal key
-        _handleMouseDownEvent(keyCode);
-        break;
-
-      // Normal key
-      default:
-        _handleMouseDownEvent(keyCode);
-        break;
-    }
-  }
-
   // Turn to default values
   function _reset() {
     _currentTrack = null;
     _currentLayoutMode = LAYOUT_MODE_DEFAULT;
     _isUpperCase = false;
   }
-
-  var _imeEvents = {
-    'mousedown': _onMouseDown,
-    'mouseover': _onMouseOver,
-    'mouseleave': _onMouseLeave,
-    'mouseup': _onMouseUp,
-    'mousemove': _onMouseMove
-  };
 
   function _onEnterArea(evt) {
     var track = evt.detail.track;
@@ -913,6 +562,19 @@ const IMEController = (function() {
     _currentKeyId = evt.detail.area;
     _currentKey = IMERender.getKey(_currentKeyId);
     IMERender.highlightKey(_currentKey);
+
+    // Control hide of alternatives menu
+    if (_currentKey.parentNode === IMERender.menu) {
+      clearTimeout(_hideMenuTimeout);
+    } else {
+      clearTimeout(_hideMenuTimeout);
+      _hideMenuTimeout = window.setTimeout(
+        function hideMenuTimeout() {
+          _hideAlternatives();
+        },
+        _kHideAlternativesCharMenuTimeout
+      );
+    }
   }
 
   function _onLeaveArea(evt, abortingCurrent) {
@@ -1046,6 +708,10 @@ const IMEController = (function() {
       default:
         _handleMouseDownEvent(keyCode);
       break;
+    }
+
+    if (_currentKey.parentNode === IMERender.menu) {
+      _hideAlternatives();
     }
 
   }

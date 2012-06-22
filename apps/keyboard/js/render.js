@@ -12,6 +12,8 @@ const IMERender = (function() {
 
   var ime, menu, pendingSymbolPanel, candidatePanel, candidatePanelToggleButton;
   var getUpperCaseValue, isSpecialKey;
+  var _isShowingAlternativesMenu = false;
+  var _alternativeMenuLimits = null;
 
   var _menuKey, _altContainer;
 
@@ -20,8 +22,18 @@ const IMERender = (function() {
   }
 
   function _touchBasedIsArea(evt) {
+    var element;
     var touch = evt.changedTouches[0];
-    var element = document.elementFromPoint(touch.screenX, touch.screenY);
+    if (_isShowingAlternativesMenu &&
+        touch.screenX >= _alternativeMenuLimits.left &&
+        touch.screenX <= _alternativeMenuLimits.right) {
+
+      element = document.elementFromPoint(touch.screenX,
+                                          _alternativeMenuLimits.lockedY);
+
+    } else {
+      element = document.elementFromPoint(touch.screenX, touch.screenY);
+    }
     return element.tagName === 'BUTTON' ? element.id : null;
   }
 
@@ -257,7 +269,8 @@ const IMERender = (function() {
     _altContainer.innerHTML = key.innerHTML;
     _altContainer.className = key.className;
     _menuKey = key;
-    key.parentNode.replaceChild(_altContainer, key);
+    _menuKey.parentNode.insertBefore(_altContainer, key);
+    _menuKey.style.display = 'none';
 
     _altContainer.querySelectorAll('span')[0].appendChild(menu);
     menu.style.display = 'block';
@@ -301,15 +314,50 @@ const IMERender = (function() {
 
     // Replace with the container
     _altContainer = document.createElement('div');
+    _altContainer.style.display = key.style.display;
     _altContainer.style.MozBoxFlex = '1';
     _altContainer.innerHTML = key.innerHTML;
     _altContainer.className = key.className;
     _menuKey = key;
-    key.parentNode.replaceChild(_altContainer, key);
+    _menuKey.parentNode.insertBefore(_altContainer, key);
+    _menuKey.style.display = 'none';
 
     // Adjust menu style
     _altContainer .querySelectorAll('span')[0].appendChild(this.menu);
     this.menu.style.display = 'block';
+
+    // Locked limits
+    // TODO: look for [LOCKED_AREA]
+
+    function getWindowTop(obj) {
+      var top;
+      top = obj.offsetTop;
+      while (obj = obj.offsetParent) {
+        top += obj.offsetTop;
+      }
+      return top;
+    }
+
+    function getWindowLeft(obj) {
+      var left;
+      left = obj.offsetLeft;
+      while (obj = obj.offsetParent) {
+        left += obj.offsetLeft;
+      }
+      return left;
+    }
+
+    var top = getWindowTop(this.menu);
+    var bottom = top + this.menu.scrollHeight;
+    var left = getWindowLeft(this.menu);
+    var right = left + this.menu.scrollWidth;
+
+    _isShowingAlternativesMenu = true;
+    _alternativeMenuLimits = {
+      left: left,
+      right: right,
+      lockedY: (top + bottom)/2.0
+    }
   };
 
   // Hide the alternative menu
@@ -319,8 +367,12 @@ const IMERender = (function() {
     this.menu.className = '';
     this.menu.style.display = 'none';
 
-    if (_altContainer)
-      _altContainer.parentNode.replaceChild(_menuKey, _altContainer);
+    if (_altContainer) {
+      _menuKey.style.display = _altContainer.style.display;
+      _altContainer.parentNode.removeChild(_altContainer);
+    }
+
+    _isShowingAlternativesMenu = false;
   };
 
   // Recalculate dimensions for the current render
@@ -374,7 +426,7 @@ const IMERender = (function() {
     dataset.forEach(function(data) {
       content += ' data-' + data.key + '="' + data.value + '" ';
     });
-    //content += ' style="-moz-box-flex:' + width + '"';
+    content += ' style="-moz-box-flex:' + width + '"';
     content += '><span>' + label + '</span></button>';
     return content;
   };
