@@ -24,7 +24,7 @@ const IMERender = (function() {
   function _touchBasedIsArea(evt) {
     var element;
     var touch = evt.changedTouches[0];
-    if (_isShowingAlternativesMenu &&
+    if (_isShowingAlternativesMenu === 'alternatives' &&
         touch.screenX >= _alternativeMenuLimits.left &&
         touch.screenX <= _alternativeMenuLimits.right) {
 
@@ -34,7 +34,13 @@ const IMERender = (function() {
     } else {
       element = document.elementFromPoint(touch.screenX, touch.screenY);
     }
-    return element.tagName === 'BUTTON' ? element.id : null;
+
+    if (element.tagName === 'BUTTON' ||
+        element.tagName === 'SPAN' &&
+        element.id.slice(0, 9) === 'candidate')
+      return element.id;
+
+    return null;
   }
 
   function _getKey(id) {
@@ -227,8 +233,9 @@ const IMERender = (function() {
         candidatePanel.dataset.truncated = true;
       }
 
-      candidates.forEach(function buildCandidateEntry(candidate) {
+      candidates.forEach(function buildCandidateEntry(candidate, index) {
         var span = document.createElement('span');
+        span.id = 'candidate-'+index;
         span.dataset.data = candidate[1];
         span.dataset.selection = true;
         span.textContent = candidate[0];
@@ -253,7 +260,7 @@ const IMERender = (function() {
         {key: 'keyboard', value: kbr},
         {key: 'keycode', value: switchCode}
       ];
-      var id = [key.dataset.row, key.dataset.column, kbr];
+      var id = [parseInt(key.dataset.row), parseInt(key.dataset.column), kbr];
       content += buildKey(
         Keyboards[kbr].menuLabel,
         className, cssWidth,
@@ -352,7 +359,7 @@ const IMERender = (function() {
     var left = getWindowLeft(this.menu);
     var right = left + this.menu.scrollWidth;
 
-    _isShowingAlternativesMenu = true;
+    _isShowingAlternativesMenu = 'alternatives';
     _alternativeMenuLimits = {
       left: left,
       right: right,
@@ -422,6 +429,7 @@ const IMERender = (function() {
   };
 
   var buildKey = function buildKey(label, className, width, dataset, id) {
+    id = id.replace(/["']/g, '');
     var content = '<button id="' + id + '" class="keyboard-key ' + className + '"';
     dataset.forEach(function(data) {
       content += ' data-' + data.key + '="' + data.value + '" ';
