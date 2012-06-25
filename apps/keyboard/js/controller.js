@@ -602,6 +602,16 @@ const IMEController = (function() {
     if (!abortingCurrent && _currentTrack !== evt.detail.track)
       return;
 
+    // IME candidate selected
+    var dataset = _currentKey.dataset;
+    if (dataset.selection) {
+      console.log('selecting');
+      window.dump(_currentKey.id);
+      _currentEngine().select(_currentKey.textContent, dataset.data);
+      IMERender.highlightKey(_currentKey);
+      return;
+    }
+
     // composite keys
     function sendCompositeKey(compositeKey) {
       compositeKey.split('').forEach(function sendEachKey(key) {
@@ -700,7 +710,7 @@ const IMEController = (function() {
         window.navigator.mozKeyboard.sendKey(keyCode, 0);
       break;
 
-      // Delete is ignores
+      // Delete is ignored
       case KeyEvent.DOM_VK_BACK_SPACE:
       break;
 

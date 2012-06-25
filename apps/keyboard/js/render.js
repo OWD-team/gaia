@@ -22,6 +22,7 @@ const IMERender = (function() {
   }
 
   function _touchBasedIsArea(evt) {
+    var candidateIdPrefix = 'keyboard-candidate'
     var element;
     var touch = evt.changedTouches[0];
     if (_isShowingAlternativesMenu === 'alternatives' &&
@@ -36,8 +37,8 @@ const IMERender = (function() {
     }
 
     if (element.tagName === 'BUTTON' ||
-        element.tagName === 'SPAN' &&
-        element.id.slice(0, 9) === 'candidate')
+        element.id === 'keyboard-candidate-panel-toggle-button' ||
+        element.dataset.selection)
       return element.id;
 
     return null;
@@ -235,7 +236,7 @@ const IMERender = (function() {
 
       candidates.forEach(function buildCandidateEntry(candidate, index) {
         var span = document.createElement('span');
-        span.id = 'candidate-'+index;
+        span.id = 'keyboard-candidate-'+index;
         span.dataset.data = candidate[1];
         span.dataset.selection = true;
         span.textContent = candidate[0];
