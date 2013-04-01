@@ -720,10 +720,6 @@ const IMEController = (function() {
       break;
     }
 
-    if (_currentKey.parentNode === IMERender.menu) {
-      _hideAlternatives();
-    }
-
   }
 
   function _onDoubleTap(evt) {
@@ -792,6 +788,7 @@ const IMEController = (function() {
     if (_currentTrack !== evt.detail.track)
       return;
 
+    _hideAlternatives();
     _currentKey = null;
   }
 

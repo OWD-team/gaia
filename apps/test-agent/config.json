@@ -1,0 +1,5 @@
+{"tests": [
+"gallery/test/unit/GestureDetector_test.js",
+"gallery/test/unit/SyntheticGestures_test.js",
+"gallery/test/unit/DeviceStorage_test.js"
+  ]}
